@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import Directory from "./pages/Directory";
+import BecomeDonor from "./pages/BecomeDonor";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/directory" element={<Directory />} />
+            <Route path="/become-donor" element={<BecomeDonor />} />
           </Routes>
         </Layout>
       </BrowserRouter>

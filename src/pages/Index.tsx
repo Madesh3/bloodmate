@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import DonorRegistrationForm from "@/components/DonorRegistrationForm";
 import { Link } from "react-router-dom";
 import { Heart, Users, Hospital } from "lucide-react";
 
@@ -21,7 +20,7 @@ const Index = () => {
               <Link to="/directory">Find Donors</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <a href="#register">Become a Donor</a>
+              <Link to="/become-donor">Become a Donor</Link>
             </Button>
           </div>
         </div>
@@ -54,14 +53,6 @@ const Index = () => {
               <p className="text-gray-600">Help maintain a stable blood supply for medical emergencies.</p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Registration Form Section */}
-      <section id="register" className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-8">Register as a Donor</h2>
-          <DonorRegistrationForm />
         </div>
       </section>
     </div>

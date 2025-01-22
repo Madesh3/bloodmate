@@ -19,7 +19,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link to="/" className="text-gray-600 hover:text-gray-900">Home</Link>
               <Link to="/directory" className="text-gray-600 hover:text-gray-900">Directory</Link>
               <Button asChild>
-                <Link to="/">Become a Donor</Link>
+                <Link to="/become-donor">Become a Donor</Link>
               </Button>
             </div>
 
@@ -35,7 +35,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   <Link to="/" className="text-lg">Home</Link>
                   <Link to="/directory" className="text-lg">Directory</Link>
                   <Button asChild>
-                    <Link to="/">Become a Donor</Link>
+                    <Link to="/become-donor">Become a Donor</Link>
                   </Button>
                 </div>
               </SheetContent>
@@ -60,7 +60,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               <div className="space-y-2">
                 <Link to="/" className="block text-gray-600 hover:text-gray-900">Home</Link>
                 <Link to="/directory" className="block text-gray-600 hover:text-gray-900">Directory</Link>
-                <Link to="/" className="block text-gray-600 hover:text-gray-900">Become a Donor</Link>
+                <Link to="/become-donor" className="block text-gray-600 hover:text-gray-900">Become a Donor</Link>
               </div>
             </div>
             <div>

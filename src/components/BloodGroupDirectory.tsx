@@ -29,7 +29,7 @@ const BloodGroupDirectory = () => {
               <SelectValue placeholder="Select Blood Group" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Blood Groups</SelectItem>
+              <SelectItem value="all">All Blood Groups</SelectItem>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                 <SelectItem key={group} value={group}>
                   {group}

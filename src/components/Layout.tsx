@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Heart, Drop, Menu } from "lucide-react";
+import { Heart, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
@@ -10,7 +10,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="container mx-auto px-4 py-4">
           <nav className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <Drop className="h-6 w-6 text-primary" />
+              <Heart className="h-6 w-6 text-primary" />
               <span className="text-xl font-bold">BloodMate</span>
             </Link>
             

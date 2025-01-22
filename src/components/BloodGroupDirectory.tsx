@@ -15,7 +15,7 @@ const BloodGroupDirectory = () => {
   const [searchCity, setSearchCity] = useState("");
 
   const filteredDonors = mockDonors.filter((donor) => {
-    const matchBloodGroup = !searchBloodGroup || donor.bloodGroup === searchBloodGroup;
+    const matchBloodGroup = searchBloodGroup === "all" || !searchBloodGroup || donor.bloodGroup === searchBloodGroup;
     const matchCity = !searchCity || donor.city.toLowerCase().includes(searchCity.toLowerCase());
     return matchBloodGroup && matchCity;
   });

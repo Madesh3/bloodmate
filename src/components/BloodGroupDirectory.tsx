@@ -2,19 +2,14 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Mock data - in a real app, this would come from a backend
-const mockDonors = [
-  { id: 1, name: "John Doe", bloodGroup: "A+", city: "New York", phone: "+1234567890" },
-  { id: 2, name: "Jane Smith", bloodGroup: "O-", city: "Los Angeles", phone: "+1987654321" },
-  { id: 3, name: "Mike Johnson", bloodGroup: "B+", city: "Chicago", phone: "+1122334455" },
-];
+import { useDonors } from "@/context/DonorsContext";
 
 const BloodGroupDirectory = () => {
+  const { donors } = useDonors();
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
 
-  const filteredDonors = mockDonors.filter((donor) => {
+  const filteredDonors = donors.filter((donor) => {
     const matchBloodGroup = searchBloodGroup === "all" || !searchBloodGroup || donor.bloodGroup === searchBloodGroup;
     const matchCity = !searchCity || donor.city.toLowerCase().includes(searchCity.toLowerCase());
     return matchBloodGroup && matchCity;
@@ -57,6 +52,7 @@ const BloodGroupDirectory = () => {
             </div>
             <div className="mt-2 text-sm text-gray-600">
               <p>Contact: {donor.phone}</p>
+              <p>Email: {donor.email}</p>
             </div>
           </Card>
         ))}

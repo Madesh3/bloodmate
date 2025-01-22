@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useDonors } from "@/context/DonorsContext";
 
 const DonorRegistrationForm = () => {
+  const { addDonor } = useDonors();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -16,8 +18,7 @@ const DonorRegistrationForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would save to a backend
-    console.log("Form submitted:", formData);
+    addDonor(formData);
     toast.success("Registration successful! Thank you for being a donor.");
     setFormData({ name: "", phone: "", email: "", bloodGroup: "", city: "" });
   };

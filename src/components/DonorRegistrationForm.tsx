@@ -24,7 +24,7 @@ const DonorRegistrationForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md p-6 shadow-lg">
+    <Card className="w-full max-w-md p-6 shadow-lg relative">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Full Name</label>
@@ -58,17 +58,17 @@ const DonorRegistrationForm = () => {
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 relative z-50">
           <label className="text-sm font-medium">Blood Group</label>
           <Select
             required
             value={formData.bloodGroup}
             onValueChange={(value) => setFormData({ ...formData, bloodGroup: value })}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-white">
               <SelectValue placeholder="Select Blood Group" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                 <SelectItem key={group} value={group}>
                   {group}

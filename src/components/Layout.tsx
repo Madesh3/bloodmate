@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Heart, Menu } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import MobileNavigation from "./MobileNavigation";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -44,9 +45,11 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 pb-16 md:pb-0">
         {children}
       </main>
+
+      <MobileNavigation />
 
       <footer className="bg-gray-50 border-t">
         <div className="container mx-auto px-4 py-8">

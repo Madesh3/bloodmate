@@ -1,41 +1,37 @@
-import Database from 'better-sqlite3';
+import { Donor } from '../types/donor';
 
-const db = new Database('donors.db');
+const DONORS_KEY = 'blood_donors';
 
-// Create donors table if it doesn't exist
-db.exec(`
-  CREATE TABLE IF NOT EXISTS donors (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    email TEXT NOT NULL,
-    bloodGroup TEXT NOT NULL,
-    city TEXT NOT NULL,
-    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
-
-export const insertDonor = (donor: Omit<Donor, "id">) => {
-  const stmt = db.prepare(`
-    INSERT INTO donors (name, phone, email, bloodGroup, city)
-    VALUES (@name, @phone, @email, @bloodGroup, @city)
-  `);
-  return stmt.run(donor);
+const getStoredDonors = (): Donor[] => {
+  const stored = localStorage.getItem(DONORS_KEY);
+  return stored ? JSON.parse(stored) : [];
 };
 
-export const getAllDonors = () => {
-  const stmt = db.prepare('SELECT * FROM donors ORDER BY createdAt DESC');
-  return stmt.all();
+export const insertDonor = (donor: Omit<Donor, "id" | "createdAt">) => {
+  const donors = getStoredDonors();
+  const newDonor: Donor = {
+    ...donor,
+    id: Date.now(),
+    createdAt: new Date().toISOString()
+  };
+  
+  donors.push(newDonor);
+  localStorage.setItem(DONORS_KEY, JSON.stringify(donors));
+  return { changes: 1 };
 };
 
-export const getDonorsByBloodGroup = (bloodGroup: string) => {
-  const stmt = db.prepare('SELECT * FROM donors WHERE bloodGroup = ?');
-  return stmt.all(bloodGroup);
+export const getAllDonors = (): Donor[] => {
+  return getStoredDonors();
 };
 
-export const getDonorsByCity = (city: string) => {
-  const stmt = db.prepare('SELECT * FROM donors WHERE city LIKE ?');
-  return stmt.all(`%${city}%`);
+export const getDonorsByBloodGroup = (bloodGroup: string): Donor[] => {
+  const donors = getStoredDonors();
+  return donors.filter(donor => donor.bloodGroup === bloodGroup);
 };
 
-export default db;
+export const getDonorsByCity = (city: string): Donor[] => {
+  const donors = getStoredDonors();
+  return donors.filter(donor => 
+    donor.city.toLowerCase().includes(city.toLowerCase())
+  );
+};

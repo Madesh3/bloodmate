@@ -210,7 +210,7 @@ const BloodGroupDirectory = () => {
                     <>
                       <p>Contact: {donor.phone}</p>
                       <p>Email: {donor.email}</p>
-                      <div className="mt-4 flex gap-2">
+                      <div className="mt-4 flex gap-2 flex-wrap">
                         <Button
                           variant="outline"
                           size="sm"
@@ -233,21 +233,15 @@ const BloodGroupDirectory = () => {
                           onClick={() => window.location.href = `mailto:${donor.email}`}
                           className="flex items-center gap-1"
                         >
-                          <MessageSquare className="w-4 h-4" /> Message
+                          <MessageSquare className="w-4 h-4" /> Email
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          asChild
+                          onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
                           className="flex items-center gap-1 bg-green-500 text-white hover:bg-green-600"
                         >
-                          <a
-                            href={getWhatsAppLink(donor.phone)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <MessageSquare className="w-4 h-4" /> Contact Now
-                          </a>
+                          <MessageSquare className="w-4 h-4" /> WhatsApp
                         </Button>
                       </div>
                     </>

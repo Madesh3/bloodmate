@@ -11,20 +11,20 @@ interface DesktopNavProps {
 const DesktopNav = ({ user, isAdmin, onSignOut }: DesktopNavProps) => {
   return (
     <div className="hidden md:flex items-center space-x-6">
+      {isAdmin && (
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/settings" className="flex items-center">
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Link>
+        </Button>
+      )}
       <Link to="/" className="text-gray-600 hover:text-gray-900">Home</Link>
       <Link to="/directory" className="text-gray-600 hover:text-gray-900">Directory</Link>
       {user ? (
         <>
           {isAdmin && (
-            <>
-              <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/settings" className="flex items-center">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
-            </>
+            <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
           )}
           <Button variant="ghost" size="sm" onClick={onSignOut}>
             <LogOut className="h-4 w-4 mr-2" />

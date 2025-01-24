@@ -22,18 +22,42 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   const fetchAdminWhatsappNumber = async () => {
     try {
-      const { data, error } = await supabase
+      // First try to get the current user's WhatsApp number if they are an admin
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('whatsapp_number, is_admin')
+        .eq('id', user?.id)
+        .single();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        throw profileError;
+      }
+
+      if (profileData?.is_admin && profileData?.whatsapp_number) {
+        console.log('Found admin WhatsApp number:', profileData.whatsapp_number);
+        setAdminWhatsappNumber(profileData.whatsapp_number);
+        return;
+      }
+
+      // If current user is not admin or doesn't have WhatsApp number, try to get any admin's number
+      const { data: adminData, error: adminError } = await supabase
         .from('profiles')
         .select('whatsapp_number')
         .eq('is_admin', true)
+        .not('whatsapp_number', 'is', null)
         .maybeSingle();
 
-      if (error) throw error;
-      
-      if (data?.whatsapp_number) {
-        setAdminWhatsappNumber(data.whatsapp_number);
+      if (adminError) {
+        console.error('Error fetching admin profile:', adminError);
+        throw adminError;
+      }
+
+      if (adminData?.whatsapp_number) {
+        console.log('Found admin WhatsApp number:', adminData.whatsapp_number);
+        setAdminWhatsappNumber(adminData.whatsapp_number);
       } else {
-        console.log('No WhatsApp number found:', data);
+        console.log('No admin WhatsApp number found');
         toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
       }
     } catch (error) {

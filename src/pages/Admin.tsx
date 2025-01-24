@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import type { Tables } from "@/integrations/supabase/types";
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
@@ -48,21 +49,21 @@ const Admin = () => {
       // Fetch WhatsApp API settings from secrets
       const { data: secretsData, error: secretsError } = await supabase
         .from('secrets')
-        .select('name, secret')
+        .select('*')
         .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_BUSINESS_ACCOUNT_ID']);
 
       if (secretsError) throw secretsError;
 
-      secretsData?.forEach(({ name, secret }) => {
-        switch (name) {
+      secretsData?.forEach((secret: Tables<'secrets'>) => {
+        switch (secret.name) {
           case 'WHATSAPP_API_TOKEN':
-            setWhatsappToken(secret || "");
+            setWhatsappToken(secret.secret || "");
             break;
           case 'WHATSAPP_PHONE_NUMBER_ID':
-            setPhoneNumberId(secret || "");
+            setPhoneNumberId(secret.secret || "");
             break;
           case 'WHATSAPP_BUSINESS_ACCOUNT_ID':
-            setBusinessAccountId(secret || "");
+            setBusinessAccountId(secret.secret || "");
             break;
         }
       });
@@ -86,7 +87,7 @@ const Admin = () => {
       if (profileError) throw profileError;
 
       // Update WhatsApp API settings in secrets
-      const secrets = [
+      const secrets: Tables<'secrets'>[] = [
         { name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
         { name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
         { name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
@@ -95,7 +96,7 @@ const Admin = () => {
       for (const secret of secrets) {
         const { error } = await supabase
           .from('secrets')
-          .upsert({ name: secret.name, secret: secret.secret }, { onConflict: 'name' });
+          .upsert(secret, { onConflict: 'name' });
         
         if (error) throw error;
       }

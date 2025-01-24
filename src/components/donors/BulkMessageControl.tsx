@@ -4,10 +4,11 @@ import { MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/components/AuthProvider";
+import type { Tables } from "@/integrations/supabase/types";
 
 interface BulkMessageControlProps {
   selectedDonors: string[];
-  donors: any[];
+  donors: Tables<'donors'>[];
   onComplete: () => void;
 }
 
@@ -59,15 +60,15 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
   const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
     try {
       // Fetch WhatsApp API credentials from secrets
-      const { data: secrets, error: secretsError } = await supabase
+      const { data: secretsData, error: secretsError } = await supabase
         .from('secrets')
-        .select('name, secret')
+        .select('*')
         .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
 
       if (secretsError) throw secretsError;
 
-      const apiToken = secrets?.find(s => s.name === 'WHATSAPP_API_TOKEN')?.secret;
-      const phoneNumberId = secrets?.find(s => s.name === 'WHATSAPP_PHONE_NUMBER_ID')?.secret;
+      const apiToken = secretsData?.find((s: Tables<'secrets'>) => s.name === 'WHATSAPP_API_TOKEN')?.secret;
+      const phoneNumberId = secretsData?.find((s: Tables<'secrets'>) => s.name === 'WHATSAPP_PHONE_NUMBER_ID')?.secret;
 
       if (!apiToken || !phoneNumberId) {
         throw new Error('WhatsApp API credentials not configured');

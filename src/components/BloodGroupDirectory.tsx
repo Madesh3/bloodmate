@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, WhatsApp } from "lucide-react";
+import { Pencil, Trash2, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
@@ -108,7 +108,6 @@ const BloodGroupDirectory = () => {
 
   const getWhatsAppLink = (phone: string) => {
     const message = encodeURIComponent("We need Blood, can you help?");
-    // Remove any non-numeric characters from the phone number
     const cleanPhone = phone.replace(/\D/g, '');
     return `https://wa.me/${cleanPhone}?text=${message}`;
   };
@@ -239,7 +238,7 @@ const BloodGroupDirectory = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <WhatsApp className="w-4 h-4" /> Contact Now
+                            <MessageSquare className="w-4 h-4" /> Contact Now
                           </a>
                         </Button>
                       </div>

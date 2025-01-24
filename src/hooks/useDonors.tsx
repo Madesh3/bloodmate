@@ -5,28 +5,34 @@ import { toast } from "sonner";
 export const useDonors = (searchBloodGroup: string, searchCity: string) => {
   const [donors, setDonors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [allDonors, setAllDonors] = useState([]); // Store all donors
 
   const fetchDonors = async () => {
     try {
+      setIsLoading(true);
       let query = supabase.from('donors')
         .select('*')
         .order('created_at', { ascending: false });
+      
+      // Apply filters but keep original data
+      const { data: allData, error: allError } = await query;
+      
+      if (allError) throw allError;
+      setAllDonors(allData || []);
 
+      // Apply filters for displayed donors
+      let filteredDonors = allData || [];
       if (searchBloodGroup && searchBloodGroup !== "_all") {
-        query = query.eq('blood_group', searchBloodGroup);
+        filteredDonors = filteredDonors.filter(donor => donor.blood_group === searchBloodGroup);
       }
       
       if (searchCity) {
-        query = query.ilike('city', `%${searchCity}%`);
+        filteredDonors = filteredDonors.filter(donor => 
+          donor.city.toLowerCase().includes(searchCity.toLowerCase())
+        );
       }
 
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
-
-      setDonors(data || []);
+      setDonors(filteredDonors);
     } catch (error) {
       console.error('Error fetching donors:', error);
       toast.error("Failed to load donors. Please try again.");
@@ -75,6 +81,7 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
     isLoading,
     handleDelete,
     setDonors,
-    fetchTotalDonorsCount
+    fetchTotalDonorsCount,
+    allDonors // Add allDonors to the return object
   };
 };

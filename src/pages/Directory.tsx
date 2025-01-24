@@ -9,14 +9,13 @@ interface BloodGroupCount {
 const Directory = () => {
   const [donorsCount, setDonorsCount] = useState<number>(0);
   const [bloodGroupCounts, setBloodGroupCounts] = useState<BloodGroupCount>({});
-  const [selectedGroup, setSelectedGroup] = useState<string>("_all");
+  const [selectedGroup, setSelectedGroup] = useState<string>("");
 
   const formatBloodGroup = (group: string) => {
-    if (group === "_all") return "All Groups";
     return (
       <div className="flex items-center gap-3">
         <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 
-          ${selectedGroup === group || selectedGroup === "_all" 
+          ${selectedGroup === group 
             ? "border-[#FFDEE2] bg-[#FDE1D3] text-primary" 
             : "border-gray-200 bg-gray-100 text-gray-400"} 
           font-semibold shadow-sm transition-all`}
@@ -27,8 +26,8 @@ const Directory = () => {
     );
   };
 
-  // All blood groups that we want to display
-  const allBloodGroups = ["_all", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+  // All blood groups that we want to display (removed "_all")
+  const allBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 max-w-7xl">

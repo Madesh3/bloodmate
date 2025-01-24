@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -9,12 +9,43 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Settings = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    if (!isAdmin) {
+      navigate('/');
+      toast.error("You don't have permission to access this page");
+      return;
+    }
+
+    fetchWhatsappNumber();
+  }, [user, isAdmin, navigate]);
+
+  const fetchWhatsappNumber = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('whatsapp_number')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+      setWhatsappNumber(data?.whatsapp_number || "");
+    } catch (error) {
+      console.error('Error fetching WhatsApp number:', error);
+      toast.error("Failed to load WhatsApp number");
+    }
+  };
 
   const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +66,7 @@ const Settings = () => {
       setConfirmPassword("");
     } catch (error) {
       console.error('Error updating password:', error);
-      toast.error(error.message);
+      toast.error("Failed to update password");
     } finally {
       setIsLoading(false);
     }
@@ -54,22 +85,41 @@ const Settings = () => {
       toast.success("WhatsApp number updated successfully");
     } catch (error) {
       console.error('Error updating WhatsApp number:', error);
-      toast.error(error.message);
+      toast.error("Failed to update WhatsApp number");
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (!user) {
-    navigate('/auth');
-    return null;
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
       
       <div className="space-y-6">
+        {/* WhatsApp Number Section */}
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">WhatsApp Settings</h2>
+          <form onSubmit={handleWhatsappUpdate} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <Input
+                id="whatsapp"
+                type="text"
+                value={whatsappNumber}
+                onChange={(e) => setWhatsappNumber(e.target.value)}
+                placeholder="Enter with country code (e.g., +1234567890)"
+                required
+              />
+              <p className="text-sm text-muted-foreground">
+                This number will be used to send notifications to donors
+              </p>
+            </div>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? "Updating..." : "Update WhatsApp Number"}
+            </Button>
+          </form>
+        </Card>
+
         {/* Password Update Section */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Update Password</h2>
@@ -98,27 +148,6 @@ const Settings = () => {
             </div>
             <Button type="submit" disabled={isLoading}>
               {isLoading ? "Updating..." : "Update Password"}
-            </Button>
-          </form>
-        </Card>
-
-        {/* WhatsApp Number Section */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">WhatsApp Settings</h2>
-          <form onSubmit={handleWhatsappUpdate} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp Number</Label>
-              <Input
-                id="whatsapp"
-                type="text"
-                value={whatsappNumber}
-                onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="Enter with country code (e.g., +1234567890)"
-                required
-              />
-            </div>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Updating..." : "Update WhatsApp Number"}
             </Button>
           </form>
         </Card>

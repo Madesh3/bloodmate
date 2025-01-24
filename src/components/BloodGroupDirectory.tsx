@@ -13,6 +13,7 @@ const BloodGroupDirectory = () => {
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSendingMessages, setIsSendingMessages] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -88,12 +89,15 @@ const BloodGroupDirectory = () => {
     });
   };
 
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   const handleBulkWhatsApp = async () => {
     if (selectedDonors.length === 0) {
       toast.error("Please select at least one donor");
       return;
     }
 
+    setIsSendingMessages(true);
     const message = encodeURIComponent("Need blood donation. Please contact if available.");
     const selectedDonorsList = donors.filter(donor => selectedDonors.includes(donor.id));
 
@@ -111,17 +115,22 @@ const BloodGroupDirectory = () => {
 
       if (error) throw error;
 
-      // Open WhatsApp for each selected donor
-      selectedDonorsList.forEach(donor => {
+      // Send WhatsApp messages one by one with a delay
+      for (const donor of selectedDonorsList) {
         const phoneNumber = donor.phone.replace(/\D/g, '');
         window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-      });
+        toast.success(`Opening WhatsApp for ${donor.name}`);
+        // Add a 2-second delay between each message
+        await delay(2000);
+      }
 
-      toast.success(`WhatsApp opened for ${selectedDonors.length} donors`);
+      toast.success(`WhatsApp opened for all ${selectedDonors.length} donors`);
       setSelectedDonors([]); // Clear selection after sending
     } catch (error) {
       console.error('Error sending messages:', error);
       toast.error("Failed to send messages");
+    } finally {
+      setIsSendingMessages(false);
     }
   };
 
@@ -144,9 +153,10 @@ const BloodGroupDirectory = () => {
           <Button
             onClick={handleBulkWhatsApp}
             className="flex items-center gap-2"
+            disabled={isSendingMessages}
           >
             <MessageSquare className="w-4 h-4" />
-            Send WhatsApp to Selected
+            {isSendingMessages ? 'Sending Messages...' : 'Send WhatsApp to Selected'}
           </Button>
         </div>
       )}

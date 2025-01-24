@@ -231,7 +231,7 @@ const BloodGroupDirectory = () => {
                           variant="outline"
                           size="sm"
                           asChild
-                          className="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white"
+                          className="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white border-0"
                         >
                           <a
                             href={getWhatsAppLink(donor.phone)}

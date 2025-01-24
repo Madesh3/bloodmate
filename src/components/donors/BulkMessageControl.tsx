@@ -30,9 +30,10 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
       if (error) throw error;
       
-      setAdminWhatsappNumber(data?.whatsapp_number || null);
-      
-      if (!data?.whatsapp_number) {
+      if (data?.whatsapp_number) {
+        setAdminWhatsappNumber(data.whatsapp_number);
+      } else {
+        console.log('No WhatsApp number found:', data);
         toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
       }
     } catch (error) {

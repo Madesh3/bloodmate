@@ -87,10 +87,10 @@ const Admin = () => {
       if (profileError) throw profileError;
 
       // Update WhatsApp API settings in secrets
-      const secrets: Tables<'secrets'>[] = [
-        { name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
-        { name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
-        { name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
+      const secrets = [
+        { id: 'whatsapp-api-token', name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
+        { id: 'whatsapp-phone-number-id', name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
+        { id: 'whatsapp-business-account-id', name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
       ];
 
       for (const secret of secrets) {

@@ -9,16 +9,24 @@ import { useDonorSelection } from "@/hooks/useDonorSelection";
 interface BloodGroupDirectoryProps {
   onDonorsCountChange?: (count: number) => void;
   onBloodGroupCountsChange?: (counts: { [key: string]: number }) => void;
+  searchBloodGroup?: string;
+  setSearchBloodGroup?: (value: string) => void;
 }
 
 const BloodGroupDirectory = ({ 
   onDonorsCountChange,
-  onBloodGroupCountsChange 
+  onBloodGroupCountsChange,
+  searchBloodGroup: externalSearchBloodGroup,
+  setSearchBloodGroup: externalSetSearchBloodGroup
 }: BloodGroupDirectoryProps) => {
-  const [searchBloodGroup, setSearchBloodGroup] = useState("");
+  const [internalSearchBloodGroup, setInternalSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
   const [totalDonorsCount, setTotalDonorsCount] = useState(0);
   const { user } = useAuth();
+
+  // Use external or internal state based on props
+  const searchBloodGroup = externalSearchBloodGroup ?? internalSearchBloodGroup;
+  const setSearchBloodGroup = externalSetSearchBloodGroup ?? setInternalSearchBloodGroup;
 
   const { donors, isLoading, handleDelete, setDonors, fetchTotalDonorsCount, allDonors } = useDonors(searchBloodGroup, searchCity);
   const { selectedDonors, setSelectedDonors, handleDonorSelect, handleSelectAll } = useDonorSelection(donors);

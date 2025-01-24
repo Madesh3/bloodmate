@@ -10,6 +10,10 @@ const Directory = () => {
   const [donorsCount, setDonorsCount] = useState<number>(0);
   const [bloodGroupCounts, setBloodGroupCounts] = useState<BloodGroupCount>({});
   const [selectedGroup, setSelectedGroup] = useState<string>("");
+  const [searchBloodGroup, setSearchBloodGroup] = useState("");
+
+  // All blood groups that we want to display
+  const allBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   const formatBloodGroup = (group: string) => {
     return (
@@ -26,8 +30,15 @@ const Directory = () => {
     );
   };
 
-  // All blood groups that we want to display (removed "_all")
-  const allBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
+  const handleGroupSelect = (group: string) => {
+    if (selectedGroup === group) {
+      setSelectedGroup("");
+      setSearchBloodGroup("_all"); // Reset filter
+    } else {
+      setSelectedGroup(group);
+      setSearchBloodGroup(group); // Apply filter
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 max-w-7xl">
@@ -55,7 +66,7 @@ const Directory = () => {
                 ${selectedGroup === group 
                   ? "ring-2 ring-primary shadow-lg border-primary" 
                   : "border-[#FFDEE2] hover:border-primary/50"}`}
-              onClick={() => setSelectedGroup(group)}
+              onClick={() => handleGroupSelect(group)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
@@ -74,6 +85,8 @@ const Directory = () => {
         <BloodGroupDirectory 
           onDonorsCountChange={setDonorsCount}
           onBloodGroupCountsChange={setBloodGroupCounts}
+          searchBloodGroup={searchBloodGroup}
+          setSearchBloodGroup={setSearchBloodGroup}
         />
       </div>
     </div>

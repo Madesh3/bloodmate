@@ -23,7 +23,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   const fetchAdminWhatsappNumber = async () => {
     try {
-      // First try to get the current user's WhatsApp number if they are an admin
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('whatsapp_number, is_admin')
@@ -36,12 +35,10 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       }
 
       if (profileData?.is_admin && profileData?.whatsapp_number) {
-        console.log('Found admin WhatsApp number:', profileData.whatsapp_number);
         setAdminWhatsappNumber(profileData.whatsapp_number);
         return;
       }
 
-      // If current user is not admin or doesn't have WhatsApp number, try to get any admin's number
       const { data: adminData, error: adminError } = await supabase
         .from('profiles')
         .select('whatsapp_number')
@@ -55,10 +52,8 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       }
 
       if (adminData?.whatsapp_number) {
-        console.log('Found admin WhatsApp number:', adminData.whatsapp_number);
         setAdminWhatsappNumber(adminData.whatsapp_number);
       } else {
-        console.log('No admin WhatsApp number found');
         toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
       }
     } catch (error) {
@@ -67,7 +62,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     }
   };
 
-  // Random delay between 8-15 seconds to mimic human behavior
   const getRandomDelay = () => Math.floor(Math.random() * (15000 - 8000 + 1) + 8000);
 
   const handleBulkWhatsApp = async () => {
@@ -87,7 +81,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     }
 
     setIsSendingMessages(true);
-    const message = encodeURIComponent(`Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`);
     const selectedDonorsList = donors.filter(donor => selectedDonors.includes(donor.id));
 
     try {
@@ -108,12 +101,15 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       for (let i = 0; i < selectedDonorsList.length; i++) {
         const donor = selectedDonorsList[i];
         const phoneNumber = donor.phone.replace(/\D/g, '');
+        const message = encodeURIComponent(`Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`);
         
         // Update progress
         setProgress(Math.round(((i + 1) / selectedDonorsList.length) * 100));
         
-        // Open WhatsApp
-        window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+        // Use the WhatsApp API URL format
+        const whatsappUrl = `https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${message}&type=phone_number&app_absent=0`;
+        window.open(whatsappUrl, '_blank');
+        
         toast.success(`Opening WhatsApp for ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
         
         // Add random delay between messages

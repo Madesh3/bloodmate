@@ -4,10 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 const DonorRegistrationForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -16,33 +14,16 @@ const DonorRegistrationForm = () => {
     city: "",
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    try {
-      const { error } = await supabase.from('donors').insert({
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        blood_group: formData.bloodGroup,
-        city: formData.city,
-      });
-
-      if (error) throw error;
-
-      toast.success("Registration successful! Thank you for being a donor.");
-      setFormData({ name: "", phone: "", email: "", bloodGroup: "", city: "" });
-    } catch (error) {
-      console.error('Error registering donor:', error);
-      toast.error("Failed to register. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    // In a real app, this would save to a backend
+    console.log("Form submitted:", formData);
+    toast.success("Registration successful! Thank you for being a donor.");
+    setFormData({ name: "", phone: "", email: "", bloodGroup: "", city: "" });
   };
 
   return (
-    <Card className="w-full max-w-md p-6 shadow-lg relative">
+    <Card className="w-full max-w-md p-6 shadow-lg">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label className="text-sm font-medium">Full Name</label>
@@ -76,17 +57,17 @@ const DonorRegistrationForm = () => {
           />
         </div>
 
-        <div className="space-y-2 relative z-50">
+        <div className="space-y-2">
           <label className="text-sm font-medium">Blood Group</label>
           <Select
             required
             value={formData.bloodGroup}
             onValueChange={(value) => setFormData({ ...formData, bloodGroup: value })}
           >
-            <SelectTrigger className="bg-white">
+            <SelectTrigger>
               <SelectValue placeholder="Select Blood Group" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
+            <SelectContent>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                 <SelectItem key={group} value={group}>
                   {group}
@@ -106,12 +87,8 @@ const DonorRegistrationForm = () => {
           />
         </div>
 
-        <Button 
-          type="submit" 
-          className="w-full bg-primary hover:bg-red-600"
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? "Registering..." : "Register as Donor"}
+        <Button type="submit" className="w-full bg-primary hover:bg-red-600">
+          Register as Donor
         </Button>
       </form>
     </Card>

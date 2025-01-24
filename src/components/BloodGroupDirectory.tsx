@@ -18,6 +18,11 @@ const BloodGroupDirectory = () => {
     fetchDonors();
   }, [searchBloodGroup, searchCity]);
 
+  // Reset selected donors when filters change
+  useEffect(() => {
+    setSelectedDonors([]);
+  }, [searchBloodGroup, searchCity]);
+
   const fetchDonors = async () => {
     try {
       let query = supabase.from('donors')
@@ -87,9 +92,20 @@ const BloodGroupDirectory = () => {
     });
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allDonorIds = donors.map(donor => donor.id);
+      setSelectedDonors(allDonorIds);
+    } else {
+      setSelectedDonors([]);
+    }
+  };
+
   if (isLoading) {
     return <div className="text-center py-8">Loading donors...</div>;
   }
+
+  const areAllSelected = donors.length > 0 && selectedDonors.length === donors.length;
 
   return (
     <div className="w-full max-w-4xl space-y-6">
@@ -98,6 +114,9 @@ const BloodGroupDirectory = () => {
         setSearchBloodGroup={setSearchBloodGroup}
         searchCity={searchCity}
         setSearchCity={setSearchCity}
+        onSelectAll={handleSelectAll}
+        allSelected={areAllSelected}
+        donorsCount={donors.length}
       />
 
       {user && selectedDonors.length > 0 && (

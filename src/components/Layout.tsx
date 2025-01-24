@@ -1,10 +1,27 @@
-import { Link } from "react-router-dom";
-import { Heart, Menu } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Heart, Menu, LogOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import MobileNavigation from "./MobileNavigation";
+import { useAuth } from "./AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/");
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("Error signing out");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
@@ -19,9 +36,26 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="hidden md:flex items-center space-x-6">
               <Link to="/" className="text-gray-600 hover:text-gray-900">Home</Link>
               <Link to="/directory" className="text-gray-600 hover:text-gray-900">Directory</Link>
-              <Button asChild>
-                <Link to="/become-donor">Become a Donor</Link>
-              </Button>
+              {user ? (
+                <>
+                  {isAdmin && (
+                    <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button asChild variant="ghost">
+                    <Link to="/auth">Sign In</Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/become-donor">Become a Donor</Link>
+                  </Button>
+                </>
+              )}
             </div>
 
             {/* Mobile Navigation */}
@@ -35,9 +69,24 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                 <div className="flex flex-col space-y-4 mt-6">
                   <Link to="/" className="text-lg">Home</Link>
                   <Link to="/directory" className="text-lg">Directory</Link>
-                  <Button asChild>
-                    <Link to="/become-donor">Become a Donor</Link>
-                  </Button>
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <Link to="/admin" className="text-lg">Admin</Link>
+                      )}
+                      <Button variant="ghost" onClick={handleSignOut}>
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/auth" className="text-lg">Sign In</Link>
+                      <Button asChild>
+                        <Link to="/become-donor">Become a Donor</Link>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>

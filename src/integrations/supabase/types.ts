@@ -80,18 +80,21 @@ export type Database = {
           email: string
           id: string
           is_admin: boolean | null
+          whatsapp_number: string | null
         }
         Insert: {
           created_at?: string
           email: string
           id: string
           is_admin?: boolean | null
+          whatsapp_number?: string | null
         }
         Update: {
           created_at?: string
           email?: string
           id?: string
           is_admin?: boolean | null
+          whatsapp_number?: string | null
         }
         Relationships: []
       }

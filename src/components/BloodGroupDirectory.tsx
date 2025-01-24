@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, WhatsApp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
@@ -92,7 +92,6 @@ const BloodGroupDirectory = () => {
 
       if (error) throw error;
 
-      // Update the donor in the local state instead of fetching all donors again
       setDonors(prevDonors => 
         prevDonors.map(donor => 
           donor.id === id ? { ...donor, ...editingDonor } : donor
@@ -105,6 +104,13 @@ const BloodGroupDirectory = () => {
       console.error('Error updating donor:', error);
       toast.error("Failed to update donor");
     }
+  };
+
+  const getWhatsAppLink = (phone: string) => {
+    const message = encodeURIComponent("We need Blood, can you help?");
+    // Remove any non-numeric characters from the phone number
+    const cleanPhone = phone.replace(/\D/g, '');
+    return `https://wa.me/${cleanPhone}?text=${message}`;
   };
 
   if (isLoading) {
@@ -221,6 +227,20 @@ const BloodGroupDirectory = () => {
                           className="flex items-center gap-1"
                         >
                           <Trash2 className="w-4 h-4" /> Delete
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="flex items-center gap-1 bg-green-500 text-white hover:bg-green-600"
+                        >
+                          <a
+                            href={getWhatsAppLink(donor.phone)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <WhatsApp className="w-4 h-4" /> Contact
+                          </a>
                         </Button>
                       </div>
                     </>

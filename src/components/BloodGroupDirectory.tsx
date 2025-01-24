@@ -22,7 +22,9 @@ const BloodGroupDirectory = () => {
 
   const fetchDonors = async () => {
     try {
-      let query = supabase.from('donors').select('*');
+      let query = supabase.from('donors')
+        .select('*')
+        .order('created_at', { ascending: true }); // Add consistent ordering
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -90,9 +92,15 @@ const BloodGroupDirectory = () => {
 
       if (error) throw error;
 
+      // Update the donor in the local state instead of fetching all donors again
+      setDonors(prevDonors => 
+        prevDonors.map(donor => 
+          donor.id === id ? { ...donor, ...editingDonor } : donor
+        )
+      );
+
       toast.success("Donor updated successfully");
       setEditingDonor(null);
-      fetchDonors();
     } catch (error) {
       console.error('Error updating donor:', error);
       toast.error("Failed to update donor");

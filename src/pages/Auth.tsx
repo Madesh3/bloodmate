@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -9,9 +9,13 @@ import { toast } from "sonner";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Get the redirect path from location state, default to home
+  const from = (location.state as any)?.from || "/";
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +27,7 @@ const Auth = () => {
       });
       if (error) throw error;
       toast.success("Check your email for the confirmation link!");
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       toast.error(error.message);
     } finally {
@@ -40,8 +44,9 @@ const Auth = () => {
         password,
       });
       if (error) throw error;
-      navigate("/");
-    } catch (error) {
+      navigate(from);
+      toast.success("Signed in successfully");
+    } catch (error: any) {
       console.error(error);
       toast.error(error.message);
     } finally {

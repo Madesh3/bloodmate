@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,19 +17,10 @@ const Settings = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
+    if (user && isAdmin) {
+      fetchWhatsappNumber();
     }
-    
-    if (!isAdmin) {
-      navigate('/');
-      toast.error("You don't have permission to access this page");
-      return;
-    }
-
-    fetchWhatsappNumber();
-  }, [user, isAdmin, navigate]);
+  }, [user, isAdmin]);
 
   const fetchWhatsappNumber = async () => {
     try {
@@ -91,8 +82,15 @@ const Settings = () => {
     }
   };
 
-  if (!user || !isAdmin) {
-    return null;
+  // Redirect to login if not authenticated
+  if (!user) {
+    return <Navigate to="/auth" state={{ from: "/settings" }} />;
+  }
+
+  // Redirect to home if not admin
+  if (!isAdmin) {
+    toast.error("You don't have permission to access this page");
+    return <Navigate to="/" />;
   }
 
   return (
@@ -100,7 +98,6 @@ const Settings = () => {
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
       
       <div className="space-y-6">
-        {/* WhatsApp Number Section */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">WhatsApp Settings</h2>
           <form onSubmit={handleWhatsappUpdate} className="space-y-4">
@@ -123,7 +120,6 @@ const Settings = () => {
           </form>
         </Card>
 
-        {/* Password Update Section */}
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Update Password</h2>
           <form onSubmit={handlePasswordUpdate} className="space-y-4">

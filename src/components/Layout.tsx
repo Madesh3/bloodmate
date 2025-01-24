@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import DesktopNav from "./navigation/DesktopNav";
 import MobileMenu from "./navigation/MobileMenu";
 import Footer from "./navigation/Footer";
+import FloatingSettingsButton from "./settings/FloatingSettingsButton";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAdmin } = useAuth();
@@ -68,6 +69,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
 
+      {isAdmin && <FloatingSettingsButton />}
       <MobileNavigation />
       <Footer />
     </div>

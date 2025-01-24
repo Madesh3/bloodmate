@@ -59,7 +59,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
     try {
-      // Fetch WhatsApp API credentials from secrets
       const { data: secretsData, error: secretsError } = await supabase
         .from('secrets')
         .select('*')
@@ -83,28 +82,16 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         body: JSON.stringify({
           messaging_product: "whatsapp",
           to: phoneNumber,
-          type: "template",
-          template: {
-            name: "blood_donation_request",
-            language: {
-              code: "en"
-            },
-            components: [
-              {
-                type: "body",
-                parameters: [
-                  {
-                    type: "text",
-                    text: adminWhatsappNumber || ""
-                  }
-                ]
-              }
-            ]
+          type: "text",
+          text: {
+            body: message
           }
         }),
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error('WhatsApp API error response:', errorData);
         throw new Error(`WhatsApp API error: ${response.statusText}`);
       }
 
@@ -141,14 +128,12 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         message_type: 'whatsapp'
       }));
 
-      // Log messages to database first
       const { error } = await supabase
         .from('messages')
         .insert(messages);
 
       if (error) throw error;
 
-      // Send messages with delays
       for (let i = 0; i < selectedDonorsList.length; i++) {
         const donor = selectedDonorsList[i];
         const phoneNumber = donor.phone.replace(/\D/g, '');
@@ -165,7 +150,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
           toast.error(`Failed to send message to ${donor.name}`);
         }
         
-        // Add delay between messages
         if (i < selectedDonorsList.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }

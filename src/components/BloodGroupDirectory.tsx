@@ -6,7 +6,11 @@ import DonorSearch from "./donors/DonorSearch";
 import DonorsList from "./donors/DonorsList";
 import BulkMessageControl from "./donors/BulkMessageControl";
 
-const BloodGroupDirectory = () => {
+interface BloodGroupDirectoryProps {
+  onDonorsCountChange?: (count: number) => void;
+}
+
+const BloodGroupDirectory = ({ onDonorsCountChange }: BloodGroupDirectoryProps) => {
   const [donors, setDonors] = useState([]);
   const [selectedDonors, setSelectedDonors] = useState([]);
   const [searchBloodGroup, setSearchBloodGroup] = useState("_all");
@@ -22,6 +26,11 @@ const BloodGroupDirectory = () => {
   useEffect(() => {
     setSelectedDonors([]);
   }, [searchBloodGroup, searchCity]);
+
+  // Update donors count whenever donors array changes
+  useEffect(() => {
+    onDonorsCountChange?.(donors.length);
+  }, [donors, onDonorsCountChange]);
 
   const fetchDonors = async () => {
     try {

@@ -69,7 +69,8 @@ const BloodGroupDirectory = () => {
     }
   };
 
-  const handleUpdate = async (id, updatedData) => {
+  const handleUpdate = async (e, id) => {
+    e.preventDefault();
     if (!user) {
       toast.error("Please sign in to update donors");
       return;
@@ -78,7 +79,13 @@ const BloodGroupDirectory = () => {
     try {
       const { error } = await supabase
         .from('donors')
-        .update(updatedData)
+        .update({
+          name: editingDonor.name,
+          city: editingDonor.city,
+          phone: editingDonor.phone,
+          email: editingDonor.email,
+          blood_group: editingDonor.blood_group
+        })
         .eq('id', id);
 
       if (error) throw error;
@@ -130,10 +137,7 @@ const BloodGroupDirectory = () => {
         {donors.map((donor) => (
           <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white relative">
             {editingDonor?.id === donor.id ? (
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleUpdate(donor.id, editingDonor);
-              }} className="space-y-4">
+              <form onSubmit={(e) => handleUpdate(e, donor.id)} className="space-y-4">
                 <Input
                   value={editingDonor.name}
                   onChange={(e) => setEditingDonor({ ...editingDonor, name: e.target.value })}

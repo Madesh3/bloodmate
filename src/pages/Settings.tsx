@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,16 +10,21 @@ import { toast } from "sonner";
 
 const Settings = () => {
   const { user, isAdmin } = useAuth();
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    if (user && isAdmin) {
-      fetchWhatsappNumber();
-    }
+    const initializeSettings = async () => {
+      if (user && isAdmin) {
+        await fetchWhatsappNumber();
+      }
+      setIsInitialized(true);
+    };
+
+    initializeSettings();
   }, [user, isAdmin]);
 
   const fetchWhatsappNumber = async () => {
@@ -81,6 +86,11 @@ const Settings = () => {
       setIsLoading(false);
     }
   };
+
+  // Wait for initialization before redirecting
+  if (!isInitialized) {
+    return <div>Loading...</div>;
+  }
 
   // Redirect to login if not authenticated
   if (!user) {

@@ -96,7 +96,10 @@ const Admin = () => {
       for (const secret of secrets) {
         const { error } = await supabase
           .from('secrets')
-          .upsert(secret, { onConflict: 'name' });
+          .upsert(secret, { 
+            onConflict: 'id',
+            ignoreDuplicates: false 
+          });
         
         if (error) throw error;
       }

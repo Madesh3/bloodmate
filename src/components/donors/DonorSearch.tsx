@@ -11,6 +11,7 @@ interface DonorSearchProps {
   onSelectAll?: (checked: boolean) => void;
   allSelected?: boolean;
   donorsCount: number;
+  totalDonorsCount: number;
 }
 
 const DonorSearch = ({
@@ -20,7 +21,8 @@ const DonorSearch = ({
   setSearchCity,
   onSelectAll,
   allSelected,
-  donorsCount
+  donorsCount,
+  totalDonorsCount
 }: DonorSearchProps) => {
   const { user } = useAuth();
 
@@ -64,7 +66,8 @@ const DonorSearch = ({
             htmlFor="selectAll"
             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
           >
-            Select all {donorsCount} donors
+            Select all {donorsCount} {donorsCount === 1 ? 'donor' : 'donors'} 
+            {donorsCount !== totalDonorsCount && ` (filtered from ${totalDonorsCount} total)`}
           </label>
         </div>
       )}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -35,6 +35,20 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
     }
   };
 
+  const fetchTotalDonorsCount = useCallback(async () => {
+    try {
+      const { count, error } = await supabase
+        .from('donors')
+        .select('*', { count: 'exact', head: true });
+
+      if (error) throw error;
+      return count || 0;
+    } catch (error) {
+      console.error('Error fetching total donors count:', error);
+      return 0;
+    }
+  }, []);
+
   const handleDelete = async (id: string) => {
     try {
       const { error } = await supabase
@@ -60,6 +74,7 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
     donors,
     isLoading,
     handleDelete,
-    setDonors
+    setDonors,
+    fetchTotalDonorsCount
   };
 };

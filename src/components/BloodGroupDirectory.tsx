@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true }); // Add consistent ordering
+        .order('created_at', { ascending: true });
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -108,7 +108,6 @@ const BloodGroupDirectory = () => {
 
   const getWhatsAppLink = (phone: string) => {
     const message = encodeURIComponent("We need Blood, can you help?");
-    // Remove any non-numeric characters from the phone number
     const cleanPhone = phone.replace(/\D/g, '');
     return `https://wa.me/${cleanPhone}?text=${message}`;
   };
@@ -228,29 +227,26 @@ const BloodGroupDirectory = () => {
                         >
                           <Trash2 className="w-4 h-4" /> Delete
                         </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          asChild
+                          className="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white"
+                        >
+                          <a
+                            href={getWhatsAppLink(donor.phone)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MessageSquare className="w-4 h-4" /> WhatsApp
+                          </a>
+                        </Button>
                       </div>
                     </>
                   ) : (
                     <p className="text-primary">Sign in to view contact details</p>
                   )}
                 </div>
-                {user && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    asChild
-                    className="absolute bottom-4 right-4 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg"
-                  >
-                    <a
-                      href={getWhatsAppLink(donor.phone)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Contact via WhatsApp"
-                    >
-                      <MessageSquare className="w-4 h-4" />
-                    </a>
-                  </Button>
-                )}
               </>
             )}
           </Card>

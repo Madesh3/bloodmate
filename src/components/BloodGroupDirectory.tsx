@@ -2,25 +2,49 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getDonorsByBloodGroup, getDonorsByCity, getAllDonors } from "@/utils/db";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const BloodGroupDirectory = () => {
   const [donors, setDonors] = useState([]);
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (searchBloodGroup && searchBloodGroup !== "all") {
-      const filteredDonors = getDonorsByBloodGroup(searchBloodGroup);
-      setDonors(filteredDonors);
-    } else if (searchCity) {
-      const filteredDonors = getDonorsByCity(searchCity);
-      setDonors(filteredDonors);
-    } else {
-      const allDonors = getAllDonors();
-      setDonors(allDonors);
-    }
+    const fetchDonors = async () => {
+      try {
+        let query = supabase.from('donors').select('*');
+
+        if (searchBloodGroup && searchBloodGroup !== "all") {
+          query = query.eq('blood_group', searchBloodGroup);
+        }
+        
+        if (searchCity) {
+          query = query.ilike('city', `%${searchCity}%`);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+          throw error;
+        }
+
+        setDonors(data || []);
+      } catch (error) {
+        console.error('Error fetching donors:', error);
+        toast.error("Failed to load donors. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDonors();
   }, [searchBloodGroup, searchCity]);
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading donors...</div>;
+  }
 
   return (
     <div className="w-full max-w-4xl space-y-6">
@@ -55,7 +79,7 @@ const BloodGroupDirectory = () => {
                 <h3 className="font-medium">{donor.name}</h3>
                 <p className="text-sm text-gray-600">{donor.city}</p>
               </div>
-              <span className="text-primary font-bold">{donor.bloodGroup}</span>
+              <span className="text-primary font-bold">{donor.blood_group}</span>
             </div>
             <div className="mt-2 text-sm text-gray-600">
               <p>Contact: {donor.phone}</p>

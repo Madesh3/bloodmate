@@ -14,11 +14,18 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   const handleSignOut = async () => {
     try {
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      if (error) {
+        console.error('Sign out error:', error);
+        toast.error("Error signing out: " + error.message);
+        return;
+      }
+      
+      // Only navigate and show success toast if sign out was successful
       navigate("/");
       toast.success("Signed out successfully");
-    } catch (error) {
-      toast.error("Error signing out");
+    } catch (error: any) {
+      console.error('Sign out error:', error);
+      toast.error("Error signing out: " + (error.message || 'Unknown error'));
     }
   };
 

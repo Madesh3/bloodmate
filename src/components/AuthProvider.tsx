@@ -17,21 +17,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Initialize the session from local storage
+    // Check current auth status
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setUser(session.user);
+      setUser(session?.user ?? null);
+      if (session?.user) {
         checkAndCreateProfile(session.user);
       }
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if (session) {
-        setUser(session.user);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
         checkAndCreateProfile(session.user);
       } else {
-        setUser(null);
         setIsAdmin(false);
       }
     });
@@ -50,10 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!profile) {
         // Create profile if it doesn't exist
@@ -65,10 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             is_admin: false
           });
 
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          throw insertError;
-        }
+        if (insertError) throw insertError;
         setIsAdmin(false);
       } else {
         setIsAdmin(profile.is_admin || false);

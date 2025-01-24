@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true }); // Add consistent ordering
+        .order('created_at', { ascending: true });
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -239,7 +239,7 @@ const BloodGroupDirectory = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <WhatsApp className="w-4 h-4" /> Contact
+                            <WhatsApp className="w-4 h-4" /> Contact Now
                           </a>
                         </Button>
                       </div>

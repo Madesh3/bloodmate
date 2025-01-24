@@ -8,9 +8,13 @@ import { useDonorSelection } from "@/hooks/useDonorSelection";
 
 interface BloodGroupDirectoryProps {
   onDonorsCountChange?: (count: number) => void;
+  onBloodGroupCountsChange?: (counts: { [key: string]: number }) => void;
 }
 
-const BloodGroupDirectory = ({ onDonorsCountChange }: BloodGroupDirectoryProps) => {
+const BloodGroupDirectory = ({ 
+  onDonorsCountChange,
+  onBloodGroupCountsChange 
+}: BloodGroupDirectoryProps) => {
   const [searchBloodGroup, setSearchBloodGroup] = useState("_all");
   const [searchCity, setSearchCity] = useState("");
   const { user } = useAuth();
@@ -18,10 +22,19 @@ const BloodGroupDirectory = ({ onDonorsCountChange }: BloodGroupDirectoryProps) 
   const { donors, isLoading, handleDelete, setDonors } = useDonors(searchBloodGroup, searchCity);
   const { selectedDonors, setSelectedDonors, handleDonorSelect, handleSelectAll } = useDonorSelection(donors);
 
-  // Update donors count whenever donors array changes
+  // Update donors count and blood group counts whenever donors array changes
   useEffect(() => {
     onDonorsCountChange?.(donors.length);
-  }, [donors, onDonorsCountChange]);
+
+    // Calculate blood group counts
+    const counts = donors.reduce((acc: { [key: string]: number }, donor) => {
+      const group = donor.blood_group;
+      acc[group] = (acc[group] || 0) + 1;
+      return acc;
+    }, {});
+
+    onBloodGroupCountsChange?.(counts);
+  }, [donors, onDonorsCountChange, onBloodGroupCountsChange]);
 
   const handleUpdate = (updatedDonor: any) => {
     setDonors(prevDonors => 

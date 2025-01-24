@@ -13,11 +13,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     try {
-      // First check if we have a session
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        // If no session, just redirect to home and clear any stale state
         navigate("/");
         return;
       }
@@ -29,7 +27,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         return;
       }
       
-      // Only navigate and show success toast if sign out was successful
       navigate("/");
       toast.success("Signed out successfully");
     } catch (error: any) {
@@ -57,8 +54,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   {isAdmin && (
                     <>
                       <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
-                      <Link to="/settings" className="text-gray-600 hover:text-gray-900">
-                        <Settings className="h-4 w-4 inline-block mr-1" />
+                      <Link to="/settings" className="text-gray-600 hover:text-gray-900 flex items-center">
+                        <Settings className="h-4 w-4 mr-2" />
                         Settings
                       </Link>
                     </>

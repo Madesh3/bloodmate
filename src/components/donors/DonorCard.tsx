@@ -100,22 +100,18 @@ const DonorCard = ({
         </div>
         <span className="text-primary font-bold">{donor.blood_group}</span>
       </div>
-      <div className="mt-2 text-sm text-gray-600">
-        {isAuthenticated ? (
-          <>
-            <p>Contact: {donor.phone}</p>
-            <p>Email: {donor.email}</p>
-            <DonorActions
-              onEdit={() => setEditingDonor(donor)}
-              onWhatsApp={handleWhatsAppMessage}
-              onCall={handleCall}
-              onDelete={() => onDelete(donor.id)}
-            />
-          </>
-        ) : (
-          <p className="text-primary">Sign in to view contact details</p>
-        )}
-      </div>
+      {isAuthenticated && (
+        <div className="mt-2 text-sm text-gray-600">
+          <p>Contact: {donor.phone}</p>
+          <p>Email: {donor.email}</p>
+          <DonorActions
+            onEdit={() => setEditingDonor(donor)}
+            onWhatsApp={handleWhatsAppMessage}
+            onCall={handleCall}
+            onDelete={() => onDelete(donor.id)}
+          />
+        </div>
+      )}
     </Card>
   );
 };

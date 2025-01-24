@@ -14,7 +14,7 @@ const Directory = () => {
     if (group === "_all") return "All Groups";
     return (
       <div className="flex items-center gap-3">
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-primary text-primary font-semibold">
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#FFDEE2] bg-[#FDE1D3] text-primary font-semibold">
           {group}
         </span>
       </div>
@@ -26,11 +26,13 @@ const Directory = () => {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Blood Donor Directory</h1>
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card>
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <Card className="sm:col-span-4">
             <CardContent className="p-4">
-              <p className="text-sm text-gray-600">Total Donors</p>
-              <p className="text-2xl font-bold">{donorsCount}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-600">Total Donors</p>
+                <p className="text-2xl font-bold">{donorsCount}</p>
+              </div>
             </CardContent>
           </Card>
           {Object.entries(bloodGroupCounts).map(([group, count]) => (

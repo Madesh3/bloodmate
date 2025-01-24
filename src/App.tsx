@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Directory from "./pages/Directory";
 import BecomeDonor from "./pages/BecomeDonor";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const App = () => (
               <Route path="/directory" element={<Directory />} />
               <Route path="/become-donor" element={<BecomeDonor />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/admin" element={<Admin />} />
             </Routes>
           </Layout>
         </BrowserRouter>

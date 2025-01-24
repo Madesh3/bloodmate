@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, MessageSquare } from "lucide-react";
+import { Pencil, Trash2, WhatsApp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true }); // Add consistent ordering
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -108,6 +108,7 @@ const BloodGroupDirectory = () => {
 
   const getWhatsAppLink = (phone: string) => {
     const message = encodeURIComponent("We need Blood, can you help?");
+    // Remove any non-numeric characters from the phone number
     const cleanPhone = phone.replace(/\D/g, '');
     return `https://wa.me/${cleanPhone}?text=${message}`;
   };
@@ -231,14 +232,14 @@ const BloodGroupDirectory = () => {
                           variant="outline"
                           size="sm"
                           asChild
-                          className="flex items-center gap-1 bg-green-500 hover:bg-green-600 text-white border-0"
+                          className="flex items-center gap-1 bg-green-500 text-white hover:bg-green-600"
                         >
                           <a
                             href={getWhatsAppLink(donor.phone)}
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <MessageSquare className="w-4 h-4" /> WhatsApp
+                            <WhatsApp className="w-4 h-4" /> Contact
                           </a>
                         </Button>
                       </div>

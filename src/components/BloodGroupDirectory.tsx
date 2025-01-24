@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
-import DonorCard from "./DonorCard";
 
 const BloodGroupDirectory = () => {
   const [donors, setDonors] = useState([]);
@@ -23,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true });
+        .order('created_at', { ascending: true }); // Add consistent ordering
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -91,6 +92,7 @@ const BloodGroupDirectory = () => {
 
       if (error) throw error;
 
+      // Update the donor in the local state instead of fetching all donors again
       setDonors(prevDonors => 
         prevDonors.map(donor => 
           donor.id === id ? { ...donor, ...editingDonor } : donor
@@ -141,15 +143,94 @@ const BloodGroupDirectory = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {donors.map((donor) => (
-          <DonorCard
-            key={donor.id}
-            donor={donor}
-            editingDonor={editingDonor}
-            setEditingDonor={setEditingDonor}
-            handleUpdate={handleUpdate}
-            handleDelete={handleDelete}
-            user={user}
-          />
+          <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white relative">
+            {editingDonor?.id === donor.id ? (
+              <form onSubmit={(e) => handleUpdate(e, donor.id)} className="space-y-4">
+                <Input
+                  value={editingDonor.name}
+                  onChange={(e) => setEditingDonor({ ...editingDonor, name: e.target.value })}
+                  placeholder="Name"
+                  className="mb-2"
+                />
+                <Input
+                  value={editingDonor.city}
+                  onChange={(e) => setEditingDonor({ ...editingDonor, city: e.target.value })}
+                  placeholder="City"
+                  className="mb-2"
+                />
+                <Input
+                  value={editingDonor.phone}
+                  onChange={(e) => setEditingDonor({ ...editingDonor, phone: e.target.value })}
+                  placeholder="Phone"
+                  className="mb-2"
+                />
+                <Input
+                  value={editingDonor.email}
+                  onChange={(e) => setEditingDonor({ ...editingDonor, email: e.target.value })}
+                  placeholder="Email"
+                  type="email"
+                  className="mb-2"
+                />
+                <Select
+                  value={editingDonor.blood_group}
+                  onValueChange={(value) => setEditingDonor({ ...editingDonor, blood_group: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Blood Group" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-[100] relative">
+                    {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
+                      <SelectItem key={group} value={group}>
+                        {group}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2 mt-4">
+                  <Button type="submit">Save</Button>
+                  <Button variant="outline" onClick={() => setEditingDonor(null)}>Cancel</Button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-medium">{donor.name}</h3>
+                    <p className="text-sm text-gray-600">{donor.city}</p>
+                  </div>
+                  <span className="text-primary font-bold">{donor.blood_group}</span>
+                </div>
+                <div className="mt-2 text-sm text-gray-600">
+                  {user ? (
+                    <>
+                      <p>Contact: {donor.phone}</p>
+                      <p>Email: {donor.email}</p>
+                      <div className="mt-4 flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingDonor(donor)}
+                          className="flex items-center gap-1"
+                        >
+                          <Pencil className="w-4 h-4" /> Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDelete(donor.id)}
+                          className="flex items-center gap-1"
+                        >
+                          <Trash2 className="w-4 h-4" /> Delete
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-primary">Sign in to view contact details</p>
+                  )}
+                </div>
+              </>
+            )}
+          </Card>
         ))}
       </div>
 

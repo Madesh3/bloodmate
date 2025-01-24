@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2, MessageSquare } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -62,12 +62,6 @@ const Admin = () => {
     }
   };
 
-  const getWhatsAppLink = (phone: string) => {
-    const message = encodeURIComponent("Hello, this is a message from the blood donation admin.");
-    const cleanPhone = phone.replace(/\D/g, '');
-    return `https://wa.me/${cleanPhone}?text=${message}`;
-  };
-
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
   }
@@ -109,14 +103,6 @@ const Admin = () => {
                       onClick={() => handleDelete(donor.id)}
                     >
                       <Trash2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
-                      className="bg-green-500 text-white hover:bg-green-600"
-                    >
-                      <MessageSquare className="h-4 w-4" />
                     </Button>
                   </div>
                 </TableCell>

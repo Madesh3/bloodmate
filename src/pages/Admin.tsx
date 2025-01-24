@@ -14,6 +14,8 @@ const Admin = () => {
   const [donors, setDonors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [whatsappDelay, setWhatsappDelay] = useState("10");
+  const [maxBulkMessages, setMaxBulkMessages] = useState("15");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ const Admin = () => {
     }
 
     fetchDonors();
-    fetchWhatsappNumber();
+    fetchWhatsappSettings();
   }, [user, isAdmin, navigate]);
 
   const fetchDonors = async () => {
@@ -49,19 +51,22 @@ const Admin = () => {
     }
   };
 
-  const fetchWhatsappNumber = async () => {
+  const fetchWhatsappSettings = async () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('whatsapp_number')
-        .eq('id', user.id)
+        .select('whatsapp_number, whatsapp_delay, max_bulk_messages')
+        .eq('id', user?.id)
         .single();
 
       if (error) throw error;
+      
       setWhatsappNumber(data?.whatsapp_number || "");
+      setWhatsappDelay(data?.whatsapp_delay?.toString() || "10");
+      setMaxBulkMessages(data?.max_bulk_messages?.toString() || "15");
     } catch (error) {
-      console.error('Error fetching WhatsApp number:', error);
-      toast.error("Failed to load WhatsApp number");
+      console.error('Error fetching WhatsApp settings:', error);
+      toast.error("Failed to load WhatsApp settings");
     }
   };
 
@@ -82,19 +87,23 @@ const Admin = () => {
     }
   };
 
-  const handleSaveWhatsappNumber = async () => {
+  const handleSaveWhatsappSettings = async () => {
     setIsSaving(true);
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ whatsapp_number: whatsappNumber })
-        .eq('id', user.id);
+        .update({
+          whatsapp_number: whatsappNumber,
+          whatsapp_delay: parseInt(whatsappDelay),
+          max_bulk_messages: parseInt(maxBulkMessages)
+        })
+        .eq('id', user?.id);
 
       if (error) throw error;
-      toast.success("WhatsApp number updated successfully");
+      toast.success("WhatsApp settings updated successfully");
     } catch (error) {
-      console.error('Error updating WhatsApp number:', error);
-      toast.error("Failed to update WhatsApp number");
+      console.error('Error updating WhatsApp settings:', error);
+      toast.error("Failed to update WhatsApp settings");
     } finally {
       setIsSaving(false);
     }
@@ -107,11 +116,11 @@ const Admin = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-8">
-        {/* WhatsApp Number Section */}
+        {/* WhatsApp Settings Section */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">WhatsApp Settings</h2>
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
+          <div className="space-y-4">
+            <div>
               <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-1">
                 WhatsApp Number
               </label>
@@ -120,14 +129,42 @@ const Admin = () => {
                 type="text"
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
-                placeholder="Enter WhatsApp number with country code"
+                placeholder="Enter with country code (e.g., +1234567890)"
+              />
+            </div>
+            <div>
+              <label htmlFor="delay" className="block text-sm font-medium text-gray-700 mb-1">
+                Message Delay (seconds)
+              </label>
+              <Input
+                id="delay"
+                type="number"
+                min="5"
+                max="30"
+                value={whatsappDelay}
+                onChange={(e) => setWhatsappDelay(e.target.value)}
+                placeholder="Delay between messages (5-30 seconds)"
+              />
+            </div>
+            <div>
+              <label htmlFor="maxMessages" className="block text-sm font-medium text-gray-700 mb-1">
+                Maximum Bulk Messages
+              </label>
+              <Input
+                id="maxMessages"
+                type="number"
+                min="1"
+                max="50"
+                value={maxBulkMessages}
+                onChange={(e) => setMaxBulkMessages(e.target.value)}
+                placeholder="Maximum number of messages in bulk"
               />
             </div>
             <Button 
-              onClick={handleSaveWhatsappNumber}
+              onClick={handleSaveWhatsappSettings}
               disabled={isSaving}
             >
-              {isSaving ? 'Saving...' : 'Save Number'}
+              {isSaving ? 'Saving...' : 'Save Settings'}
             </Button>
           </div>
         </div>

@@ -71,7 +71,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "donors"
             referencedColumns: ["id"]
-          },
+          }
         ]
       }
       profiles: {
@@ -81,6 +81,8 @@ export type Database = {
           id: string
           is_admin: boolean | null
           whatsapp_number: string | null
+          whatsapp_delay: number | null
+          max_bulk_messages: number | null
         }
         Insert: {
           created_at?: string
@@ -88,6 +90,8 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           whatsapp_number?: string | null
+          whatsapp_delay?: number | null
+          max_bulk_messages?: number | null
         }
         Update: {
           created_at?: string
@@ -95,6 +99,8 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           whatsapp_number?: string | null
+          whatsapp_delay?: number | null
+          max_bulk_messages?: number | null
         }
         Relationships: []
       }

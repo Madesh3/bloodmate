@@ -48,13 +48,13 @@ const BloodGroupDirectory = () => {
 
   return (
     <div className="w-full max-w-4xl space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+        <div className="relative">
           <Select value={searchBloodGroup} onValueChange={setSearchBloodGroup}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Select Blood Group" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white z-50 shadow-lg">
               <SelectItem value="all">All Blood Groups</SelectItem>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                 <SelectItem key={group} value={group}>
@@ -68,12 +68,13 @@ const BloodGroupDirectory = () => {
           placeholder="Search by city..."
           value={searchCity}
           onChange={(e) => setSearchCity(e.target.value)}
+          className="bg-white"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {donors.map((donor) => (
-          <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow">
+          <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white">
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-medium">{donor.name}</h3>

@@ -14,6 +14,7 @@ interface BulkMessageControlProps {
 const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageControlProps) => {
   const [isSendingMessages, setIsSendingMessages] = useState(false);
   const [adminWhatsappNumber, setAdminWhatsappNumber] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -66,7 +67,8 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     }
   };
 
-  const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+  // Random delay between 8-15 seconds to mimic human behavior
+  const getRandomDelay = () => Math.floor(Math.random() * (15000 - 8000 + 1) + 8000);
 
   const handleBulkWhatsApp = async () => {
     if (!adminWhatsappNumber) {
@@ -76,6 +78,11 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
     if (selectedDonors.length === 0) {
       toast.error("Please select at least one donor");
+      return;
+    }
+
+    if (selectedDonors.length > 15) {
+      toast.error("For safety, please select 15 or fewer donors at a time");
       return;
     }
 
@@ -90,17 +97,31 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         message_type: 'whatsapp'
       }));
 
+      // Log messages to database first
       const { error } = await supabase
         .from('messages')
         .insert(messages);
 
       if (error) throw error;
 
-      for (const donor of selectedDonorsList) {
+      // Send messages with random delays
+      for (let i = 0; i < selectedDonorsList.length; i++) {
+        const donor = selectedDonorsList[i];
         const phoneNumber = donor.phone.replace(/\D/g, '');
+        
+        // Update progress
+        setProgress(Math.round(((i + 1) / selectedDonorsList.length) * 100));
+        
+        // Open WhatsApp
         window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-        toast.success(`Opening WhatsApp for ${donor.name}`);
-        await delay(2000);
+        toast.success(`Opening WhatsApp for ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
+        
+        // Add random delay between messages
+        if (i < selectedDonorsList.length - 1) {
+          const delay = getRandomDelay();
+          toast.info(`Waiting ${Math.round(delay/1000)} seconds before sending next message...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
       }
 
       toast.success(`WhatsApp opened for all ${selectedDonors.length} donors`);
@@ -110,12 +131,16 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       toast.error("Failed to send messages. Please try again later.");
     } finally {
       setIsSendingMessages(false);
+      setProgress(0);
     }
   };
 
   return (
     <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow">
-      <span>{selectedDonors.length} donors selected</span>
+      <div className="flex flex-col">
+        <span>{selectedDonors.length} donors selected</span>
+        {progress > 0 && <span className="text-sm text-gray-500">Progress: {progress}%</span>}
+      </div>
       <Button
         onClick={handleBulkWhatsApp}
         className="flex items-center gap-2 bg-rose-400 hover:bg-rose-500 text-white"

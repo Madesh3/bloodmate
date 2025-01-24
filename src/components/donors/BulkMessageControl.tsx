@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/components/AuthProvider";
 import type { Tables } from "@/integrations/supabase/types";
+import { sendWhatsAppMessage } from "@/utils/whatsapp";
+import { useAdminWhatsApp } from "@/hooks/useAdminWhatsApp";
+import MessageProgress from "./MessageProgress";
 
 interface BulkMessageControlProps {
   selectedDonors: string[];
@@ -14,116 +16,8 @@ interface BulkMessageControlProps {
 
 const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageControlProps) => {
   const [isSendingMessages, setIsSendingMessages] = useState(false);
-  const [adminWhatsappNumber, setAdminWhatsappNumber] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    fetchAdminWhatsappNumber();
-  }, []);
-
-  const fetchAdminWhatsappNumber = async () => {
-    try {
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('whatsapp_number, is_admin')
-        .eq('id', user?.id)
-        .single();
-
-      if (profileError) throw profileError;
-
-      if (profileData?.is_admin && profileData?.whatsapp_number) {
-        setAdminWhatsappNumber(profileData.whatsapp_number);
-        return;
-      }
-
-      const { data: adminData, error: adminError } = await supabase
-        .from('profiles')
-        .select('whatsapp_number')
-        .eq('is_admin', true)
-        .not('whatsapp_number', 'is', null)
-        .maybeSingle();
-
-      if (adminError) throw adminError;
-
-      if (adminData?.whatsapp_number) {
-        setAdminWhatsappNumber(adminData.whatsapp_number);
-      } else {
-        toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
-      }
-    } catch (error) {
-      console.error('Error fetching admin WhatsApp number:', error);
-      toast.error("Failed to load admin contact details. Please try again later.");
-    }
-  };
-
-  const formatPhoneNumber = (phone: string): string => {
-    // Remove all non-digit characters
-    const digits = phone.replace(/\D/g, '');
-    
-    // Ensure number starts with country code
-    if (!digits.startsWith('91') && !digits.startsWith('1')) {
-      return `91${digits}`; // Add India country code as default
-    }
-    
-    return digits;
-  };
-
-  const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
-    try {
-      const { data: secretsData, error: secretsError } = await supabase
-        .from('secrets')
-        .select('*')
-        .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
-
-      if (secretsError) throw secretsError;
-
-      const apiToken = secretsData?.find((s: Tables<'secrets'>) => s.name === 'WHATSAPP_API_TOKEN')?.secret;
-      const phoneNumberId = secretsData?.find((s: Tables<'secrets'>) => s.name === 'WHATSAPP_PHONE_NUMBER_ID')?.secret;
-
-      if (!apiToken || !phoneNumberId) {
-        throw new Error('WhatsApp API credentials not configured');
-      }
-
-      const formattedPhone = formatPhoneNumber(phoneNumber);
-      console.log('Sending message to formatted number:', formattedPhone);
-
-      const response = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${apiToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messaging_product: "whatsapp",
-          to: formattedPhone,
-          type: "template",
-          template: {
-            name: "hello_world",
-            language: {
-              code: "en_US"
-            }
-          }
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('WhatsApp API error response:', errorData);
-        
-        if (errorData.error?.code === 131030) {
-          throw new Error(`Phone number ${formattedPhone} is not in the WhatsApp test number list. During development, you can only send messages to numbers that are registered for testing.`);
-        }
-        
-        throw new Error(`WhatsApp API error: ${errorData.error?.message || response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error sending WhatsApp message:', error);
-      throw error;
-    }
-  };
+  const { adminWhatsappNumber } = useAdminWhatsApp();
 
   const handleBulkWhatsApp = async () => {
     if (!adminWhatsappNumber) {
@@ -151,21 +45,16 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         message_type: 'whatsapp'
       }));
 
-      const { error } = await supabase
-        .from('messages')
-        .insert(messages);
-
+      const { error } = await supabase.from('messages').insert(messages);
       if (error) throw error;
 
       for (let i = 0; i < selectedDonorsList.length; i++) {
         const donor = selectedDonorsList[i];
-        const phoneNumber = donor.phone;
-        
         setProgress(Math.round(((i + 1) / selectedDonorsList.length) * 100));
         
         try {
           await sendWhatsAppMessage(
-            phoneNumber,
+            donor.phone,
             `Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`
           );
           toast.success(`Message sent to ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
@@ -191,10 +80,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   return (
     <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow">
-      <div className="flex flex-col">
-        <span>{selectedDonors.length} donors selected</span>
-        {progress > 0 && <span className="text-sm text-gray-500">Progress: {progress}%</span>}
-      </div>
+      <MessageProgress progress={progress} selectedCount={selectedDonors.length} />
       <Button
         onClick={handleBulkWhatsApp}
         className="flex items-center gap-2 bg-rose-400 hover:bg-rose-500 text-white"

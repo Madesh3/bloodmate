@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, MessageSquare, Phone } from "lucide-react";
+import { Pencil, Trash2, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -56,11 +56,6 @@ const DonorCard = ({
     const phoneNumber = donor.phone.replace(/\D/g, ''); // Remove non-digits
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, '_blank');
-  };
-
-  const handleCall = () => {
-    const phoneNumber = donor.phone.replace(/\D/g, '');
-    window.location.href = `tel:${phoneNumber}`;
   };
 
   if (editingDonor) {
@@ -139,7 +134,7 @@ const DonorCard = ({
           <>
             <p>Contact: {donor.phone}</p>
             <p>Email: {donor.email}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -155,14 +150,6 @@ const DonorCard = ({
                 className="flex items-center gap-1"
               >
                 <MessageSquare className="w-4 h-4" /> Message
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCall}
-                className="flex items-center gap-1"
-              >
-                <Phone className="w-4 h-4" /> Call Now
               </Button>
               <Button
                 variant="destructive"

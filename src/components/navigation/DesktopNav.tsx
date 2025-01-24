@@ -18,22 +18,18 @@ const DesktopNav = ({ user, isAdmin, onSignOut }: DesktopNavProps) => {
           {isAdmin && (
             <>
               <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
-            </>
-          )}
-          <div className="flex items-center space-x-2">
-            {isAdmin && (
               <Button asChild variant="ghost" size="sm">
                 <Link to="/settings" className="flex items-center">
                   <Settings className="h-4 w-4 mr-2" />
                   Settings
                 </Link>
               </Button>
-            )}
-            <Button variant="ghost" size="sm" onClick={onSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
+            </>
+          )}
+          <Button variant="ghost" size="sm" onClick={onSignOut}>
+            <LogOut className="h-4 w-4 mr-2" />
+            Sign Out
+          </Button>
         </>
       ) : (
         <>

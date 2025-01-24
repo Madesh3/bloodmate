@@ -26,13 +26,19 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         .from('profiles')
         .select('whatsapp_number')
         .eq('is_admin', true)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setAdminWhatsappNumber(data?.whatsapp_number);
+      
+      if (!data?.whatsapp_number) {
+        toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
+        return;
+      }
+      
+      setAdminWhatsappNumber(data.whatsapp_number);
     } catch (error) {
       console.error('Error fetching admin WhatsApp number:', error);
-      toast.error("Failed to load admin contact details");
+      toast.error("Failed to load admin contact details. Please try again later.");
     }
   };
 
@@ -40,7 +46,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   const handleBulkWhatsApp = async () => {
     if (!adminWhatsappNumber) {
-      toast.error("Admin WhatsApp number not configured");
+      toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
       return;
     }
 
@@ -77,7 +83,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       onComplete();
     } catch (error) {
       console.error('Error sending messages:', error);
-      toast.error("Failed to send messages");
+      toast.error("Failed to send messages. Please try again later.");
     } finally {
       setIsSendingMessages(false);
     }

@@ -30,12 +30,11 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
       if (error) throw error;
       
+      setAdminWhatsappNumber(data?.whatsapp_number || null);
+      
       if (!data?.whatsapp_number) {
         toast.error("Admin WhatsApp number not configured. Please configure it in Settings.");
-        return;
       }
-      
-      setAdminWhatsappNumber(data.whatsapp_number);
     } catch (error) {
       console.error('Error fetching admin WhatsApp number:', error);
       toast.error("Failed to load admin contact details. Please try again later.");
@@ -94,8 +93,8 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       <span>{selectedDonors.length} donors selected</span>
       <Button
         onClick={handleBulkWhatsApp}
-        className="flex items-center gap-2"
-        disabled={isSendingMessages || !adminWhatsappNumber}
+        className="flex items-center gap-2 bg-rose-400 hover:bg-rose-500 text-white"
+        disabled={isSendingMessages || selectedDonors.length === 0}
       >
         <MessageSquare className="w-4 h-4" />
         {isSendingMessages ? 'Sending Messages...' : 'Send WhatsApp to Selected'}

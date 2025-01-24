@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useDonors } from "@/context/DonorsContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const DonorRegistrationForm = () => {
-  const { addDonor } = useDonors();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -16,11 +16,29 @@ const DonorRegistrationForm = () => {
     city: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    addDonor(formData);
-    toast.success("Registration successful! Thank you for being a donor.");
-    setFormData({ name: "", phone: "", email: "", bloodGroup: "", city: "" });
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase.from('donors').insert({
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        blood_group: formData.bloodGroup,
+        city: formData.city,
+      });
+
+      if (error) throw error;
+
+      toast.success("Registration successful! Thank you for being a donor.");
+      setFormData({ name: "", phone: "", email: "", bloodGroup: "", city: "" });
+    } catch (error) {
+      console.error('Error registering donor:', error);
+      toast.error("Failed to register. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -88,8 +106,12 @@ const DonorRegistrationForm = () => {
           />
         </div>
 
-        <Button type="submit" className="w-full bg-primary hover:bg-red-600">
-          Register as Donor
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-red-600"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Registering..." : "Register as Donor"}
         </Button>
       </form>
     </Card>

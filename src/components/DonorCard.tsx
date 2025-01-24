@@ -96,7 +96,15 @@ const DonorCard = ({
           {user ? (
             <>
               <div className="space-y-2 mb-6">
-                <p className="text-gray-700">Contact: {donor.phone}</p>
+                <p className="text-gray-700">
+                  Contact: {" "}
+                  <button 
+                    onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {donor.phone}
+                  </button>
+                </p>
                 <p className="text-gray-700">Email: {donor.email}</p>
               </div>
               <div className="flex gap-2">

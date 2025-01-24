@@ -13,6 +13,15 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     try {
+      // First check if we have a session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        // If no session, just redirect to home and clear any stale state
+        navigate("/");
+        return;
+      }
+
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Sign out error:', error);

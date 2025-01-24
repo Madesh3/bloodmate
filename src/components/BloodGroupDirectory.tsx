@@ -16,7 +16,7 @@ const BloodGroupDirectory = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingDonor, setEditingDonor] = useState(null);
   const [selectedDonors, setSelectedDonors] = useState([]);
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
 
   useEffect(() => {
     fetchDonors();
@@ -53,8 +53,8 @@ const BloodGroupDirectory = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!user) {
-      toast.error("Please sign in to delete donors");
+    if (!isAdmin) {
+      toast.error("Only admins can delete donors");
       return;
     }
 
@@ -76,8 +76,8 @@ const BloodGroupDirectory = () => {
 
   const handleUpdate = async (e, id) => {
     e.preventDefault();
-    if (!user) {
-      toast.error("Please sign in to update donors");
+    if (!isAdmin) {
+      toast.error("Only admins can update donors");
       return;
     }
 
@@ -301,22 +301,26 @@ const BloodGroupDirectory = () => {
                           <p>Contact: {donor.phone}</p>
                           <p>Email: {donor.email}</p>
                           <div className="mt-4 flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingDonor(donor)}
-                              className="flex items-center gap-1"
-                            >
-                              <Pencil className="w-4 h-4" /> Edit
-                            </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDelete(donor.id)}
-                              className="flex items-center gap-1"
-                            >
-                              <Trash2 className="w-4 h-4" /> Delete
-                            </Button>
+                            {isAdmin && (
+                              <>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEditingDonor(donor)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Pencil className="w-4 h-4" /> Edit
+                                </Button>
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDelete(donor.id)}
+                                  className="flex items-center gap-1"
+                                >
+                                  <Trash2 className="w-4 h-4" /> Delete
+                                </Button>
+                              </>
+                            )}
                             <Button
                               variant="outline"
                               size="sm"

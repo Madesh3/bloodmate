@@ -1,7 +1,7 @@
-import { createRoot } from 'react-dom/client'
-import App from './App'
-import './index.css'
-import { DonorsProvider } from './context/DonorsContext'
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './index.css';
+import { DonorsProvider } from './context/DonorsContext';
 
 const root = document.getElementById("root");
 

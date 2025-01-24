@@ -17,25 +17,29 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   const handleSignOut = async () => {
     try {
+      // First check if we have a session
       const { data: { session } } = await supabase.auth.getSession();
       
+      // If no session, just redirect to home
       if (!session) {
         navigate("/");
         return;
       }
 
+      // If we have a session, try to sign out
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Sign out error:', error);
-        toast.error("Error signing out: " + error.message);
+        toast.error("Error signing out");
         return;
       }
       
       navigate("/");
       toast.success("Signed out successfully");
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign out error:', error);
-      toast.error("Error signing out: " + (error.message || 'Unknown error'));
+      // If there's any error, just redirect to home
+      navigate("/");
     }
   };
 

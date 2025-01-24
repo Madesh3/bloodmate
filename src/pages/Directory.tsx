@@ -16,9 +16,9 @@ const Directory = () => {
       <div className="flex items-center gap-3">
         <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 
           ${selectedGroup === group 
-            ? "border-[#FFDEE2] bg-[#FDE1D3] text-primary" 
-            : "border-gray-200 bg-gray-100 text-gray-400"} 
-          font-semibold shadow-sm transition-all`}
+            ? "border-primary bg-[#FFF1F2] text-primary shadow-lg" 
+            : "border-[#FFDEE2] bg-[#FFF5F5] text-primary/70"} 
+          font-semibold transition-all`}
         >
           {group}
         </span>
@@ -51,14 +51,16 @@ const Directory = () => {
           {allBloodGroups.map((group) => (
             <Card 
               key={group} 
-              className={`hover:shadow-lg transition-shadow cursor-pointer
-                ${selectedGroup === group ? "ring-2 ring-primary" : "opacity-75"}`}
+              className={`hover:shadow-lg transition-all cursor-pointer
+                ${selectedGroup === group 
+                  ? "ring-2 ring-primary shadow-lg border-primary" 
+                  : "border-[#FFDEE2] hover:border-primary/50"}`}
               onClick={() => setSelectedGroup(group)}
             >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                  <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-gray-400"}`}>
+                  <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
                     {bloodGroupCounts[group] || 0}
                   </p>
                 </div>

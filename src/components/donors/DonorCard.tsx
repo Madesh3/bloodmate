@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -40,6 +40,12 @@ const DonorCard = ({ donor, onUpdate, onDelete, isAuthenticated }: DonorCardProp
       console.error('Error updating donor:', error);
       toast.error("Failed to update donor");
     }
+  };
+
+  const handleWhatsAppMessage = () => {
+    const phoneNumber = donor.phone.replace(/\D/g, ''); // Remove non-digits
+    const whatsappUrl = `https://wa.me/${phoneNumber}`;
+    window.open(whatsappUrl, '_blank');
   };
 
   if (editingDonor) {
@@ -117,6 +123,14 @@ const DonorCard = ({ donor, onUpdate, onDelete, isAuthenticated }: DonorCardProp
                 className="flex items-center gap-1"
               >
                 <Pencil className="w-4 h-4" /> Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleWhatsAppMessage}
+                className="flex items-center gap-1"
+              >
+                <MessageSquare className="w-4 h-4" /> Message
               </Button>
               <Button
                 variant="destructive"

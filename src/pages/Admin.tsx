@@ -5,14 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [whatsappDelay, setWhatsappDelay] = useState("10");
-  const [maxBulkMessages, setMaxBulkMessages] = useState("15");
+  const [whatsappToken, setWhatsappToken] = useState("");
+  const [phoneNumberId, setPhoneNumberId] = useState("");
+  const [businessAccountId, setBusinessAccountId] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -27,50 +30,80 @@ const Admin = () => {
       return;
     }
 
-    fetchWhatsappSettings();
+    fetchSettings();
   }, [user, isAdmin, navigate]);
 
-  const fetchWhatsappSettings = async () => {
+  const fetchSettings = async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch WhatsApp number from profiles
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('whatsapp_number')
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
-      
-      setWhatsappNumber(data?.whatsapp_number || "");
+      if (profileError) throw profileError;
+      setWhatsappNumber(profileData?.whatsapp_number || "");
+
+      // Fetch WhatsApp API settings from secrets
+      const { data: secretsData, error: secretsError } = await supabase
+        .from('secrets')
+        .select('name, secret')
+        .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_BUSINESS_ACCOUNT_ID']);
+
+      if (secretsError) throw secretsError;
+
+      secretsData?.forEach(({ name, secret }) => {
+        switch (name) {
+          case 'WHATSAPP_API_TOKEN':
+            setWhatsappToken(secret || "");
+            break;
+          case 'WHATSAPP_PHONE_NUMBER_ID':
+            setPhoneNumberId(secret || "");
+            break;
+          case 'WHATSAPP_BUSINESS_ACCOUNT_ID':
+            setBusinessAccountId(secret || "");
+            break;
+        }
+      });
     } catch (error) {
-      console.error('Error fetching WhatsApp settings:', error);
-      toast.error("Failed to load WhatsApp settings");
+      console.error('Error fetching settings:', error);
+      toast.error("Failed to load settings");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const formatPhoneNumber = (number: string) => {
-    // Remove all non-digit characters except plus sign
-    return number.replace(/[^\d+]/g, '');
-  };
-
-  const handleSaveWhatsappSettings = async () => {
+  const handleSaveSettings = async () => {
     setIsSaving(true);
     try {
-      const formattedNumber = formatPhoneNumber(whatsappNumber);
-      
-      const { error } = await supabase
+      // Update WhatsApp number in profiles
+      const { error: profileError } = await supabase
         .from('profiles')
-        .update({
-          whatsapp_number: formattedNumber,
-        })
+        .update({ whatsapp_number: whatsappNumber })
         .eq('id', user?.id);
 
-      if (error) throw error;
-      toast.success("WhatsApp settings updated successfully");
+      if (profileError) throw profileError;
+
+      // Update WhatsApp API settings in secrets
+      const secrets = [
+        { name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
+        { name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
+        { name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
+      ];
+
+      for (const secret of secrets) {
+        const { error } = await supabase
+          .from('secrets')
+          .upsert({ name: secret.name, secret: secret.secret }, { onConflict: 'name' });
+        
+        if (error) throw error;
+      }
+
+      toast.success("Settings updated successfully");
     } catch (error) {
-      console.error('Error updating WhatsApp settings:', error);
-      toast.error("Failed to update WhatsApp settings");
+      console.error('Error updating settings:', error);
+      toast.error("Failed to update settings");
     } finally {
       setIsSaving(false);
     }
@@ -83,13 +116,14 @@ const Admin = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto space-y-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-6">WhatsApp API Configuration</h2>
-          <div className="space-y-6">
-            <div>
-              <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700 mb-1">
-                WhatsApp Business Phone Number
-              </label>
+        <Card>
+          <CardHeader>
+            <CardTitle>WhatsApp Configuration</CardTitle>
+            <CardDescription>Configure your WhatsApp Business API settings</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="whatsapp">Admin WhatsApp Number</Label>
               <Input
                 id="whatsapp"
                 type="text"
@@ -97,20 +131,53 @@ const Admin = () => {
                 onChange={(e) => setWhatsappNumber(e.target.value)}
                 placeholder="Enter with country code (e.g., +1234567890)"
               />
-              <p className="mt-1 text-sm text-gray-500">
-                Enter the number with country code, only digits and plus sign allowed
+              <p className="text-sm text-gray-500">
+                Enter the number with country code that donors can contact
               </p>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="token">WhatsApp API Token</Label>
+              <Input
+                id="token"
+                type="password"
+                value={whatsappToken}
+                onChange={(e) => setWhatsappToken(e.target.value)}
+                placeholder="Enter your WhatsApp API token"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumberId">Phone Number ID</Label>
+              <Input
+                id="phoneNumberId"
+                type="text"
+                value={phoneNumberId}
+                onChange={(e) => setPhoneNumberId(e.target.value)}
+                placeholder="Enter your WhatsApp Phone Number ID"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="businessAccountId">Business Account ID</Label>
+              <Input
+                id="businessAccountId"
+                type="text"
+                value={businessAccountId}
+                onChange={(e) => setBusinessAccountId(e.target.value)}
+                placeholder="Enter your WhatsApp Business Account ID"
+              />
+            </div>
+
             <Button 
-              onClick={handleSaveWhatsappSettings}
+              onClick={handleSaveSettings}
               disabled={isSaving}
               className="w-full"
             >
               {isSaving ? 'Saving...' : 'Save Settings'}
             </Button>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

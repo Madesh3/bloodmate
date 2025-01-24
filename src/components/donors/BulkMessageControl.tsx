@@ -29,9 +29,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         .eq('id', user?.id)
         .single();
 
-      if (profileError) {
-        throw profileError;
-      }
+      if (profileError) throw profileError;
 
       if (profileData?.is_admin && profileData?.whatsapp_number) {
         setAdminWhatsappNumber(profileData.whatsapp_number);
@@ -45,9 +43,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         .not('whatsapp_number', 'is', null)
         .maybeSingle();
 
-      if (adminError) {
-        throw adminError;
-      }
+      if (adminError) throw adminError;
 
       if (adminData?.whatsapp_number) {
         setAdminWhatsappNumber(adminData.whatsapp_number);
@@ -62,15 +58,22 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
   const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
     try {
-      const { data: { secret: apiToken }, error: secretError } = await supabase
+      // Fetch WhatsApp API credentials from secrets
+      const { data: secrets, error: secretsError } = await supabase
         .from('secrets')
-        .select('secret')
-        .eq('name', 'WHATSAPP_API_TOKEN')
-        .single();
+        .select('name, secret')
+        .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID']);
 
-      if (secretError) throw secretError;
+      if (secretsError) throw secretsError;
 
-      const response = await fetch('https://graph.facebook.com/v17.0/FROM_PHONE_NUMBER_ID/messages', {
+      const apiToken = secrets?.find(s => s.name === 'WHATSAPP_API_TOKEN')?.secret;
+      const phoneNumberId = secrets?.find(s => s.name === 'WHATSAPP_PHONE_NUMBER_ID')?.secret;
+
+      if (!apiToken || !phoneNumberId) {
+        throw new Error('WhatsApp API credentials not configured');
+      }
+
+      const response = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiToken}`,

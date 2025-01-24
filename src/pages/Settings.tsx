@@ -28,13 +28,19 @@ const Settings = () => {
 
   const fetchWhatsappNumber = async () => {
     try {
+      console.log('Fetching WhatsApp number for user:', user?.id);
       const { data, error } = await supabase
         .from('profiles')
         .select('whatsapp_number')
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching WhatsApp number:', error);
+        throw error;
+      }
+      
+      console.log('Fetched WhatsApp number:', data?.whatsapp_number);
       setWhatsappNumber(data?.whatsapp_number || "");
     } catch (error: any) {
       console.error('Error fetching WhatsApp number:', error);
@@ -69,14 +75,25 @@ const Settings = () => {
 
   const handleWhatsappUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!whatsappNumber) {
+      toast.error("Please enter a WhatsApp number");
+      return;
+    }
+
     setIsLoading(true);
     try {
+      console.log('Updating WhatsApp number for user:', user?.id, 'to:', whatsappNumber);
       const { error } = await supabase
         .from('profiles')
         .update({ whatsapp_number: whatsappNumber })
         .eq('id', user?.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating WhatsApp number:', error);
+        throw error;
+      }
+
+      console.log('WhatsApp number updated successfully');
       toast.success("WhatsApp number updated successfully");
     } catch (error: any) {
       console.error('Error updating WhatsApp number:', error);

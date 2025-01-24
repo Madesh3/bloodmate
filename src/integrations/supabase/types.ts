@@ -18,6 +18,7 @@ export interface Database {
           id: string
           name: string
           phone: string
+          donation_count: number
         }
         Insert: {
           blood_group: string
@@ -27,6 +28,7 @@ export interface Database {
           id?: string
           name: string
           phone: string
+          donation_count?: number
         }
         Update: {
           blood_group?: string
@@ -36,6 +38,7 @@ export interface Database {
           id?: string
           name?: string
           phone?: string
+          donation_count?: number
         }
         Relationships: []
       }

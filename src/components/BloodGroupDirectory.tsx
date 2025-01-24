@@ -98,13 +98,17 @@ const BloodGroupDirectory = () => {
 
   return (
     <div className="w-full max-w-4xl space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <Select value={searchBloodGroup} onValueChange={setSearchBloodGroup}>
             <SelectTrigger className="w-full bg-white">
               <SelectValue placeholder="Select Blood Group" />
             </SelectTrigger>
-            <SelectContent className="bg-white z-50 shadow-lg">
+            <SelectContent 
+              className="bg-white z-[100] relative" 
+              position="popper" 
+              sideOffset={4}
+            >
               <SelectItem value="all">All Blood Groups</SelectItem>
               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                 <SelectItem key={group} value={group}>
@@ -124,7 +128,7 @@ const BloodGroupDirectory = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {donors.map((donor) => (
-          <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white">
+          <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white relative">
             {editingDonor?.id === donor.id ? (
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -162,7 +166,7 @@ const BloodGroupDirectory = () => {
                   <SelectTrigger>
                     <SelectValue placeholder="Blood Group" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white z-[100] relative">
                     {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
                       <SelectItem key={group} value={group}>
                         {group}

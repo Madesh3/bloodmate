@@ -36,12 +36,12 @@ const Settings = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('whatsapp_number')
-        .eq('id', user.id)
+        .eq('id', user?.id)
         .single();
 
       if (error) throw error;
       setWhatsappNumber(data?.whatsapp_number || "");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching WhatsApp number:', error);
       toast.error("Failed to load WhatsApp number");
     }
@@ -64,7 +64,7 @@ const Settings = () => {
       toast.success("Password updated successfully");
       setPassword("");
       setConfirmPassword("");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating password:', error);
       toast.error("Failed to update password");
     } finally {
@@ -79,17 +79,21 @@ const Settings = () => {
       const { error } = await supabase
         .from('profiles')
         .update({ whatsapp_number: whatsappNumber })
-        .eq('id', user.id);
+        .eq('id', user?.id);
 
       if (error) throw error;
       toast.success("WhatsApp number updated successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating WhatsApp number:', error);
       toast.error("Failed to update WhatsApp number");
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!user || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -108,7 +112,6 @@ const Settings = () => {
                 value={whatsappNumber}
                 onChange={(e) => setWhatsappNumber(e.target.value)}
                 placeholder="Enter with country code (e.g., +1234567890)"
-                required
               />
               <p className="text-sm text-muted-foreground">
                 This number will be used to send notifications to donors
@@ -131,7 +134,6 @@ const Settings = () => {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
                 minLength={6}
               />
             </div>
@@ -142,7 +144,6 @@ const Settings = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                required
                 minLength={6}
               />
             </div>

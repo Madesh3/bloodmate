@@ -1,113 +1,34 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { useState } from "react";
 import { useAuth } from "./AuthProvider";
 import DonorSearch from "./donors/DonorSearch";
 import DonorsList from "./donors/DonorsList";
 import BulkMessageControl from "./donors/BulkMessageControl";
+import { useDonors } from "@/hooks/useDonors";
+import { useDonorSelection } from "@/hooks/useDonorSelection";
 
 interface BloodGroupDirectoryProps {
   onDonorsCountChange?: (count: number) => void;
 }
 
 const BloodGroupDirectory = ({ onDonorsCountChange }: BloodGroupDirectoryProps) => {
-  const [donors, setDonors] = useState([]);
-  const [selectedDonors, setSelectedDonors] = useState([]);
   const [searchBloodGroup, setSearchBloodGroup] = useState("_all");
   const [searchCity, setSearchCity] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchDonors();
-  }, [searchBloodGroup, searchCity]);
-
-  // Reset selected donors when filters change
-  useEffect(() => {
-    setSelectedDonors([]);
-  }, [searchBloodGroup, searchCity]);
+  const { donors, isLoading, handleDelete, setDonors } = useDonors(searchBloodGroup, searchCity);
+  const { selectedDonors, setSelectedDonors, handleDonorSelect, handleSelectAll } = useDonorSelection(donors);
 
   // Update donors count whenever donors array changes
   useEffect(() => {
     onDonorsCountChange?.(donors.length);
   }, [donors, onDonorsCountChange]);
 
-  const fetchDonors = async () => {
-    try {
-      let query = supabase.from('donors')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (searchBloodGroup && searchBloodGroup !== "_all") {
-        query = query.eq('blood_group', searchBloodGroup);
-      }
-      
-      if (searchCity) {
-        query = query.ilike('city', `%${searchCity}%`);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        throw error;
-      }
-
-      setDonors(data || []);
-    } catch (error) {
-      console.error('Error fetching donors:', error);
-      toast.error("Failed to load donors. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!user) {
-      toast.error("Please sign in to delete donors");
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from('donors')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      toast.success("Donor deleted successfully");
-      fetchDonors();
-    } catch (error) {
-      console.error('Error deleting donor:', error);
-      toast.error("Failed to delete donor");
-    }
-  };
-
-  const handleUpdate = (updatedDonor) => {
+  const handleUpdate = (updatedDonor: any) => {
     setDonors(prevDonors => 
       prevDonors.map(donor => 
         donor.id === updatedDonor.id ? { ...donor, ...updatedDonor } : donor
       )
     );
-  };
-
-  const handleDonorSelect = (donorId) => {
-    setSelectedDonors(prev => {
-      if (prev.includes(donorId)) {
-        return prev.filter(id => id !== donorId);
-      } else {
-        return [...prev, donorId];
-      }
-    });
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allDonorIds = donors.map(donor => donor.id);
-      setSelectedDonors(allDonorIds);
-    } else {
-      setSelectedDonors([]);
-    }
   };
 
   if (isLoading) {

@@ -17,6 +17,13 @@ const BloodGroupDirectory = () => {
   const [editingDonor, setEditingDonor] = useState(null);
   const [selectedDonors, setSelectedDonors] = useState([]);
   const { user, isAdmin } = useAuth();
+  const [newDonor, setNewDonor] = useState({
+    name: "",
+    city: "",
+    phone: "",
+    email: "",
+    blood_group: ""
+  });
 
   useEffect(() => {
     fetchDonors();
@@ -43,7 +50,7 @@ const BloodGroupDirectory = () => {
       }
 
       setDonors(data || []);
-      setSelectedDonors([]); // Reset selections when donors list changes
+      setSelectedDonors([]);
     } catch (error) {
       console.error('Error fetching donors:', error);
       toast.error("Failed to load donors. Please try again.");
@@ -106,6 +113,35 @@ const BloodGroupDirectory = () => {
     } catch (error) {
       console.error('Error updating donor:', error);
       toast.error("Failed to update donor");
+    }
+  };
+
+  const handleCreate = async (e) => {
+    e.preventDefault();
+    if (!isAdmin) {
+      toast.error("Only admins can add new donors");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('donors')
+        .insert([newDonor]);
+
+      if (error) throw error;
+
+      toast.success("Donor added successfully");
+      setNewDonor({
+        name: "",
+        city: "",
+        phone: "",
+        email: "",
+        blood_group: ""
+      });
+      fetchDonors();
+    } catch (error) {
+      console.error('Error creating donor:', error);
+      toast.error("Failed to add donor");
     }
   };
 
@@ -183,6 +219,55 @@ const BloodGroupDirectory = () => {
 
   return (
     <div className="w-full max-w-4xl space-y-6">
+      {isAdmin && (
+        <Card className="p-4 bg-white">
+          <form onSubmit={handleCreate} className="space-y-4">
+            <h3 className="font-semibold">Add New Donor</h3>
+            <Input
+              placeholder="Name"
+              value={newDonor.name}
+              onChange={(e) => setNewDonor({ ...newDonor, name: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="City"
+              value={newDonor.city}
+              onChange={(e) => setNewDonor({ ...newDonor, city: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Phone"
+              value={newDonor.phone}
+              onChange={(e) => setNewDonor({ ...newDonor, phone: e.target.value })}
+              required
+            />
+            <Input
+              placeholder="Email"
+              type="email"
+              value={newDonor.email}
+              onChange={(e) => setNewDonor({ ...newDonor, email: e.target.value })}
+              required
+            />
+            <Select
+              value={newDonor.blood_group}
+              onValueChange={(value) => setNewDonor({ ...newDonor, blood_group: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Blood Group" />
+              </SelectTrigger>
+              <SelectContent>
+                {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
+                  <SelectItem key={group} value={group}>
+                    {group}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button type="submit">Add Donor</Button>
+          </form>
+        </Card>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="relative">
           <Select value={searchBloodGroup} onValueChange={setSearchBloodGroup}>

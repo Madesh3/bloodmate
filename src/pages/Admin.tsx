@@ -20,6 +20,7 @@ const Admin = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    console.log("Auth state:", { user, isAdmin });
     if (!user) {
       navigate('/auth');
       return;
@@ -36,6 +37,8 @@ const Admin = () => {
 
   const fetchSettings = async () => {
     try {
+      console.log("Fetching settings...");
+      
       // Fetch WhatsApp number from profiles
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -43,7 +46,12 @@ const Admin = () => {
         .eq('id', user?.id)
         .single();
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        throw profileError;
+      }
+      
+      console.log("Profile data:", profileData);
       setWhatsappNumber(profileData?.whatsapp_number || "");
 
       // Fetch WhatsApp API settings from secrets
@@ -52,7 +60,12 @@ const Admin = () => {
         .select('*')
         .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_BUSINESS_ACCOUNT_ID']);
 
-      if (secretsError && secretsError.code !== 'PGRST116') throw secretsError;
+      if (secretsError && secretsError.code !== 'PGRST116') {
+        console.error('Secrets fetch error:', secretsError);
+        throw secretsError;
+      }
+
+      console.log("Secrets data:", secretsData);
 
       if (secretsData) {
         secretsData.forEach((secret: Tables<'secrets'>) => {
@@ -80,13 +93,18 @@ const Admin = () => {
   const handleSaveSettings = async () => {
     setIsSaving(true);
     try {
+      console.log("Saving settings...");
+      
       // Update WhatsApp number in profiles
       const { error: profileError } = await supabase
         .from('profiles')
         .update({ whatsapp_number: whatsappNumber })
         .eq('id', user?.id);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile update error:', profileError);
+        throw profileError;
+      }
 
       // Update WhatsApp API settings in secrets
       const secrets = [
@@ -96,21 +114,17 @@ const Admin = () => {
       ];
 
       for (const secretData of secrets) {
+        console.log("Updating secret:", secretData.name);
+        
         const { error } = await supabase
           .from('secrets')
-          .insert(secretData)
-          .select()
-          .single();
+          .upsert(secretData, { 
+            onConflict: 'name',
+            ignoreDuplicates: false 
+          });
         
-        if (error && error.code === '23505') { // Unique violation error code
-          // If insert fails due to duplicate, try update
-          const { error: updateError } = await supabase
-            .from('secrets')
-            .update({ secret: secretData.secret })
-            .eq('name', secretData.name);
-          
-          if (updateError) throw updateError;
-        } else if (error) {
+        if (error) {
+          console.error('Secret update error:', error);
           throw error;
         }
       }

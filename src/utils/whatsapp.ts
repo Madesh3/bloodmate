@@ -11,7 +11,7 @@ export const formatPhoneNumber = (phone: string): string => {
   return digits;
 };
 
-export const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
+export const sendWhatsAppMessage = async (phoneNumber: string, recipientName: string, adminNumber: string) => {
   try {
     const { data: secretsData, error: secretsError } = await supabase
       .from('secrets')
@@ -41,10 +41,25 @@ export const sendWhatsAppMessage = async (phoneNumber: string, message: string) 
         to: formattedPhone,
         type: "template",
         template: {
-          name: "hello_world",
+          name: "blood_donation_request",
           language: {
-            code: "en_US"
-          }
+            code: "en"
+          },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                {
+                  type: "text",
+                  text: recipientName
+                },
+                {
+                  type: "text",
+                  text: adminNumber
+                }
+              ]
+            }
+          ]
         }
       }),
     });

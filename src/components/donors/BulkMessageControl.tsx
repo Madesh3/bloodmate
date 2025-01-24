@@ -41,7 +41,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     try {
       const messages = selectedDonorsList.map(donor => ({
         donor_id: donor.id,
-        message_text: `Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`,
+        message_text: `Blood donation request sent to ${donor.name}`,
         message_type: 'whatsapp'
       }));
 
@@ -55,7 +55,8 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         try {
           await sendWhatsAppMessage(
             donor.phone,
-            `Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`
+            donor.name,
+            adminWhatsappNumber
           );
           toast.success(`Message sent to ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
         } catch (error: any) {

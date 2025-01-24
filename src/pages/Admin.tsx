@@ -48,6 +48,7 @@ const Admin = () => {
 
       if (profileError) {
         console.error('Profile fetch error:', profileError);
+        toast.error("Failed to fetch profile settings");
         throw profileError;
       }
       
@@ -60,8 +61,10 @@ const Admin = () => {
         .select('*')
         .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_BUSINESS_ACCOUNT_ID']);
 
-      if (secretsError && secretsError.code !== 'PGRST116') {
+      // Only throw error if it's not a "relation does not exist" error during first load
+      if (secretsError && secretsError.code !== '42P01') {
         console.error('Secrets fetch error:', secretsError);
+        toast.error("Failed to fetch WhatsApp settings");
         throw secretsError;
       }
 
@@ -71,20 +74,19 @@ const Admin = () => {
         secretsData.forEach((secret: Tables<'secrets'>) => {
           switch (secret.name) {
             case 'WHATSAPP_API_TOKEN':
-              setWhatsappToken(secret.secret || "");
+              setWhatsappToken(secret.secret);
               break;
             case 'WHATSAPP_PHONE_NUMBER_ID':
-              setPhoneNumberId(secret.secret || "");
+              setPhoneNumberId(secret.secret);
               break;
             case 'WHATSAPP_BUSINESS_ACCOUNT_ID':
-              setBusinessAccountId(secret.secret || "");
+              setBusinessAccountId(secret.secret);
               break;
           }
         });
       }
     } catch (error) {
       console.error('Error fetching settings:', error);
-      toast.error("Failed to load settings");
     } finally {
       setIsLoading(false);
     }
@@ -103,6 +105,7 @@ const Admin = () => {
 
       if (profileError) {
         console.error('Profile update error:', profileError);
+        toast.error("Failed to update profile settings");
         throw profileError;
       }
 
@@ -125,6 +128,7 @@ const Admin = () => {
         
         if (error) {
           console.error('Secret update error:', error);
+          toast.error(`Failed to update ${secretData.name}`);
           throw error;
         }
       }

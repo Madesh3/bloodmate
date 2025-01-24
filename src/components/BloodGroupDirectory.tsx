@@ -239,12 +239,13 @@ const BloodGroupDirectory = () => {
                     variant="outline"
                     size="icon"
                     asChild
-                    className="absolute bottom-4 right-4 bg-green-500 text-white hover:bg-green-600 rounded-full"
+                    className="absolute bottom-4 right-4 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg"
                   >
                     <a
                       href={getWhatsAppLink(donor.phone)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      aria-label="Contact via WhatsApp"
                     >
                       <MessageSquare className="w-4 h-4" />
                     </a>

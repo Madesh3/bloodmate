@@ -4,23 +4,31 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthProvider";
 import { Send, MessageSquare } from "lucide-react";
 
 const Directory = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchBloodGroup, setSearchBloodGroup] = useState("");
+  const [searchCity, setSearchCity] = useState("");
   const { isAdmin } = useAuth();
   const adminPhone = "9777128214"; // Admin WhatsApp number
 
   const { data: donors, isLoading } = useQuery({
-    queryKey: ["donors"],
+    queryKey: ["donors", searchBloodGroup, searchCity],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("donors")
-        .select("*")
-        .order("created_at", { ascending: false });
+      let query = supabase.from("donors").select("*");
 
+      if (searchBloodGroup && searchBloodGroup !== "all") {
+        query = query.eq("blood_group", searchBloodGroup);
+      }
+      
+      if (searchCity) {
+        query = query.ilike("city", `%${searchCity}%`);
+      }
+
+      const { data, error } = await query.order("created_at", { ascending: false });
       if (error) throw error;
       return data || [];
     },
@@ -70,32 +78,22 @@ const Directory = () => {
 
   const handleSendBulkWhatsApp = async () => {
     try {
-      const filteredDonors = donors?.filter((donor) =>
-        donor.blood_group.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      if (!filteredDonors || filteredDonors.length === 0) {
-        toast.error("No donors found matching the blood group");
+      if (!donors || donors.length === 0) {
+        toast.error("No donors found matching the criteria");
         return;
       }
 
       // Send messages to all filtered donors
-      for (const donor of filteredDonors) {
+      for (const donor of donors) {
         await handleSendWhatsApp(donor);
       }
 
-      toast.success(`Sent messages to ${filteredDonors.length} donors`);
+      toast.success(`Sent messages to ${donors.length} donors`);
     } catch (error) {
       console.error("Error sending bulk WhatsApp messages:", error);
       toast.error("Failed to send some WhatsApp messages");
     }
   };
-
-  const filteredDonors = donors?.filter((donor) =>
-    donor.blood_group.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    donor.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    donor.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
   if (isLoading) {
     return <div className="container mx-auto px-4 py-8">Loading...</div>;
@@ -103,27 +101,43 @@ const Directory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-6 flex gap-4 items-center">
-        <Input
-          type="text"
-          placeholder="Search by blood group, city, or name..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-md"
-        />
-        {isAdmin && searchTerm && (
-          <Button
-            onClick={handleSendBulkWhatsApp}
-            className="flex items-center gap-2"
-          >
-            <MessageSquare className="h-4 w-4" />
-            Notify All Matching Donors
-          </Button>
-        )}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="relative">
+          <Select value={searchBloodGroup} onValueChange={setSearchBloodGroup}>
+            <SelectTrigger className="w-full bg-white">
+              <SelectValue placeholder="Select Blood Group" />
+            </SelectTrigger>
+            <SelectContent className="bg-white z-[100] relative">
+              <SelectItem value="all">All Blood Groups</SelectItem>
+              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
+                <SelectItem key={group} value={group}>
+                  {group}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex gap-4">
+          <Input
+            placeholder="Search by city..."
+            value={searchCity}
+            onChange={(e) => setSearchCity(e.target.value)}
+            className="bg-white flex-1"
+          />
+          {isAdmin && (donors?.length ?? 0) > 0 && (
+            <Button
+              onClick={handleSendBulkWhatsApp}
+              className="flex items-center gap-2 whitespace-nowrap"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Notify All
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDonors?.map((donor) => (
+        {donors?.map((donor) => (
           <Card key={donor.id} className="p-6">
             <div className="flex justify-between items-start">
               <div>
@@ -148,7 +162,7 @@ const Directory = () => {
         ))}
       </div>
 
-      {filteredDonors?.length === 0 && (
+      {(!donors || donors.length === 0) && (
         <div className="text-center py-8 text-gray-500">
           No donors found matching your search criteria
         </div>

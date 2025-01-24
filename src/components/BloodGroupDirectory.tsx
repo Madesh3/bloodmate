@@ -228,26 +228,28 @@ const BloodGroupDirectory = () => {
                         >
                           <Trash2 className="w-4 h-4" /> Delete
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          asChild
-                          className="flex items-center gap-1 bg-green-500 text-white hover:bg-green-600"
-                        >
-                          <a
-                            href={getWhatsAppLink(donor.phone)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <MessageSquare className="w-4 h-4" /> Contact
-                          </a>
-                        </Button>
                       </div>
                     </>
                   ) : (
                     <p className="text-primary">Sign in to view contact details</p>
                   )}
                 </div>
+                {user && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    asChild
+                    className="absolute bottom-4 right-4 bg-green-500 text-white hover:bg-green-600 rounded-full"
+                  >
+                    <a
+                      href={getWhatsAppLink(donor.phone)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                    </a>
+                  </Button>
+                )}
               </>
             )}
           </Card>

@@ -57,6 +57,18 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     }
   };
 
+  const formatPhoneNumber = (phone: string): string => {
+    // Remove all non-digit characters
+    const digits = phone.replace(/\D/g, '');
+    
+    // Ensure number starts with country code
+    if (!digits.startsWith('91') && !digits.startsWith('1')) {
+      return `91${digits}`; // Add India country code as default
+    }
+    
+    return digits;
+  };
+
   const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
     try {
       const { data: secretsData, error: secretsError } = await supabase
@@ -73,6 +85,9 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         throw new Error('WhatsApp API credentials not configured');
       }
 
+      const formattedPhone = formatPhoneNumber(phoneNumber);
+      console.log('Sending message to formatted number:', formattedPhone);
+
       const response = await fetch(`https://graph.facebook.com/v17.0/${phoneNumberId}/messages`, {
         method: 'POST',
         headers: {
@@ -81,7 +96,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         },
         body: JSON.stringify({
           messaging_product: "whatsapp",
-          to: phoneNumber,
+          to: formattedPhone,
           type: "template",
           template: {
             name: "hello_world",
@@ -95,7 +110,12 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
       if (!response.ok) {
         const errorData = await response.json();
         console.error('WhatsApp API error response:', errorData);
-        throw new Error(`WhatsApp API error: ${response.statusText}`);
+        
+        if (errorData.error?.code === 131030) {
+          throw new Error(`Phone number ${formattedPhone} is not in the WhatsApp test number list. During development, you can only send messages to numbers that are registered for testing.`);
+        }
+        
+        throw new Error(`WhatsApp API error: ${errorData.error?.message || response.statusText}`);
       }
 
       return await response.json();
@@ -139,7 +159,7 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
       for (let i = 0; i < selectedDonorsList.length; i++) {
         const donor = selectedDonorsList[i];
-        const phoneNumber = donor.phone.replace(/\D/g, '');
+        const phoneNumber = donor.phone;
         
         setProgress(Math.round(((i + 1) / selectedDonorsList.length) * 100));
         
@@ -149,8 +169,8 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
             `Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`
           );
           toast.success(`Message sent to ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
-        } catch (error) {
-          toast.error(`Failed to send message to ${donor.name}`);
+        } catch (error: any) {
+          toast.error(`Failed to send message to ${donor.name}: ${error.message}`);
         }
         
         if (i < selectedDonorsList.length - 1) {

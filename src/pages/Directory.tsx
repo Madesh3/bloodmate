@@ -11,7 +11,18 @@ const Directory = () => {
   const [bloodGroupCounts, setBloodGroupCounts] = useState<BloodGroupCount>({});
 
   const formatBloodGroup = (group: string) => {
-    return group === "_all" ? "All Groups" : `Group ${group}`;
+    if (group === "_all") return "All Groups";
+    
+    // Split the blood group into letter and symbol (if any)
+    const letter = group.charAt(0);
+    const symbol = group.slice(1);
+    
+    return (
+      <span className="inline-flex items-baseline">
+        <span className="text-primary text-lg font-semibold">{letter}</span>
+        <span className="text-gray-700 text-sm font-medium">{symbol}</span>
+      </span>
+    );
   };
 
   return (

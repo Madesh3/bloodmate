@@ -6,15 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface DonorCardProps {
   donor: any;
   onUpdate: (updatedDonor: any) => void;
   onDelete: (id: string) => void;
   isAuthenticated: boolean;
+  isSelected?: boolean;
+  onSelect?: (id: string) => void;
 }
 
-const DonorCard = ({ donor, onUpdate, onDelete, isAuthenticated }: DonorCardProps) => {
+const DonorCard = ({ 
+  donor, 
+  onUpdate, 
+  onDelete, 
+  isAuthenticated,
+  isSelected = false,
+  onSelect
+}: DonorCardProps) => {
   const [editingDonor, setEditingDonor] = useState<any>(null);
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -104,9 +114,18 @@ const DonorCard = ({ donor, onUpdate, onDelete, isAuthenticated }: DonorCardProp
   return (
     <Card className="p-4 hover:shadow-md transition-shadow bg-white relative">
       <div className="flex justify-between items-start">
-        <div>
-          <h3 className="font-medium">{donor.name}</h3>
-          <p className="text-sm text-gray-600">{donor.city}</p>
+        <div className="flex items-start gap-2">
+          {isAuthenticated && onSelect && (
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelect(donor.id)}
+              className="mt-1"
+            />
+          )}
+          <div>
+            <h3 className="font-medium">{donor.name}</h3>
+            <p className="text-sm text-gray-600">{donor.city}</p>
+          </div>
         </div>
         <span className="text-primary font-bold">{donor.blood_group}</span>
       </div>

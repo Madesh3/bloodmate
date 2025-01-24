@@ -4,9 +4,12 @@ import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
 import DonorCard from "./donors/DonorCard";
 import DonorSearch from "./donors/DonorSearch";
+import { Button } from "./ui/button";
+import { MessageSquare } from "lucide-react";
 
 const BloodGroupDirectory = () => {
   const [donors, setDonors] = useState([]);
+  const [selectedDonors, setSelectedDonors] = useState([]);
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -75,6 +78,53 @@ const BloodGroupDirectory = () => {
     );
   };
 
+  const handleDonorSelect = (donorId) => {
+    setSelectedDonors(prev => {
+      if (prev.includes(donorId)) {
+        return prev.filter(id => id !== donorId);
+      } else {
+        return [...prev, donorId];
+      }
+    });
+  };
+
+  const handleBulkWhatsApp = async () => {
+    if (selectedDonors.length === 0) {
+      toast.error("Please select at least one donor");
+      return;
+    }
+
+    const message = encodeURIComponent("Need blood donation. Please contact if available.");
+    const selectedDonorsList = donors.filter(donor => selectedDonors.includes(donor.id));
+
+    try {
+      // Store messages in the database
+      const messages = selectedDonorsList.map(donor => ({
+        donor_id: donor.id,
+        message_text: "Need blood donation. Please contact if available.",
+        message_type: 'whatsapp'
+      }));
+
+      const { error } = await supabase
+        .from('messages')
+        .insert(messages);
+
+      if (error) throw error;
+
+      // Open WhatsApp for each selected donor
+      selectedDonorsList.forEach(donor => {
+        const phoneNumber = donor.phone.replace(/\D/g, '');
+        window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+      });
+
+      toast.success(`WhatsApp opened for ${selectedDonors.length} donors`);
+      setSelectedDonors([]); // Clear selection after sending
+    } catch (error) {
+      console.error('Error sending messages:', error);
+      toast.error("Failed to send messages");
+    }
+  };
+
   if (isLoading) {
     return <div className="text-center py-8">Loading donors...</div>;
   }
@@ -88,6 +138,19 @@ const BloodGroupDirectory = () => {
         setSearchCity={setSearchCity}
       />
 
+      {user && selectedDonors.length > 0 && (
+        <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow">
+          <span>{selectedDonors.length} donors selected</span>
+          <Button
+            onClick={handleBulkWhatsApp}
+            className="flex items-center gap-2"
+          >
+            <MessageSquare className="w-4 h-4" />
+            Send WhatsApp to Selected
+          </Button>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {donors.map((donor) => (
           <DonorCard
@@ -96,6 +159,8 @@ const BloodGroupDirectory = () => {
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             isAuthenticated={!!user}
+            isSelected={selectedDonors.includes(donor.id)}
+            onSelect={handleDonorSelect}
           />
         ))}
       </div>

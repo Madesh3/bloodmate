@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -18,14 +17,14 @@ const Settings = () => {
 
   useEffect(() => {
     const initializeSettings = async () => {
-      if (user && isAdmin) {
+      if (user) {
         await fetchWhatsappNumber();
       }
       setIsInitialized(true);
     };
 
     initializeSettings();
-  }, [user, isAdmin]);
+  }, [user]);
 
   const fetchWhatsappNumber = async () => {
     try {
@@ -97,12 +96,6 @@ const Settings = () => {
     return <Navigate to="/auth" state={{ from: "/settings" }} />;
   }
 
-  // Redirect to home if not admin
-  if (!isAdmin) {
-    toast.error("You don't have permission to access this page");
-    return <Navigate to="/" />;
-  }
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
@@ -112,7 +105,9 @@ const Settings = () => {
           <h2 className="text-xl font-semibold mb-4">WhatsApp Settings</h2>
           <form onSubmit={handleWhatsappUpdate} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="whatsapp">WhatsApp Number</Label>
+              <label htmlFor="whatsapp" className="block text-sm font-medium text-gray-700">
+                WhatsApp Number
+              </label>
               <Input
                 id="whatsapp"
                 type="text"
@@ -134,7 +129,9 @@ const Settings = () => {
           <h2 className="text-xl font-semibold mb-4">Update Password</h2>
           <form onSubmit={handlePasswordUpdate} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                New Password
+              </label>
               <Input
                 id="password"
                 type="password"
@@ -144,7 +141,9 @@ const Settings = () => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
               <Input
                 id="confirmPassword"
                 type="password"

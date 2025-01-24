@@ -41,9 +41,9 @@ export const sendWhatsAppMessage = async (phoneNumber: string, recipientName: st
         to: formattedPhone,
         type: "template",
         template: {
-          name: "blood_donation_request",
+          name: "hello_world",
           language: {
-            code: "en"
+            code: "en_US"
           },
           components: [
             {

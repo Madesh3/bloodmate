@@ -52,21 +52,23 @@ const Admin = () => {
         .select('*')
         .in('name', ['WHATSAPP_API_TOKEN', 'WHATSAPP_PHONE_NUMBER_ID', 'WHATSAPP_BUSINESS_ACCOUNT_ID']);
 
-      if (secretsError) throw secretsError;
+      if (secretsError && secretsError.code !== 'PGRST116') throw secretsError;
 
-      secretsData?.forEach((secret: Tables<'secrets'>) => {
-        switch (secret.name) {
-          case 'WHATSAPP_API_TOKEN':
-            setWhatsappToken(secret.secret || "");
-            break;
-          case 'WHATSAPP_PHONE_NUMBER_ID':
-            setPhoneNumberId(secret.secret || "");
-            break;
-          case 'WHATSAPP_BUSINESS_ACCOUNT_ID':
-            setBusinessAccountId(secret.secret || "");
-            break;
-        }
-      });
+      if (secretsData) {
+        secretsData.forEach((secret: Tables<'secrets'>) => {
+          switch (secret.name) {
+            case 'WHATSAPP_API_TOKEN':
+              setWhatsappToken(secret.secret || "");
+              break;
+            case 'WHATSAPP_PHONE_NUMBER_ID':
+              setPhoneNumberId(secret.secret || "");
+              break;
+            case 'WHATSAPP_BUSINESS_ACCOUNT_ID':
+              setBusinessAccountId(secret.secret || "");
+              break;
+          }
+        });
+      }
     } catch (error) {
       console.error('Error fetching settings:', error);
       toast.error("Failed to load settings");
@@ -88,20 +90,29 @@ const Admin = () => {
 
       // Update WhatsApp API settings in secrets
       const secrets = [
-        { id: 'whatsapp-api-token', name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
-        { id: 'whatsapp-phone-number-id', name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
-        { id: 'whatsapp-business-account-id', name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
+        { name: 'WHATSAPP_API_TOKEN', secret: whatsappToken },
+        { name: 'WHATSAPP_PHONE_NUMBER_ID', secret: phoneNumberId },
+        { name: 'WHATSAPP_BUSINESS_ACCOUNT_ID', secret: businessAccountId }
       ];
 
-      for (const secret of secrets) {
+      for (const secretData of secrets) {
         const { error } = await supabase
           .from('secrets')
-          .upsert(secret, { 
-            onConflict: 'id',
-            ignoreDuplicates: false 
-          });
+          .insert(secretData)
+          .select()
+          .single();
         
-        if (error) throw error;
+        if (error && error.code === '23505') { // Unique violation error code
+          // If insert fails due to duplicate, try update
+          const { error: updateError } = await supabase
+            .from('secrets')
+            .update({ secret: secretData.secret })
+            .eq('name', secretData.name);
+          
+          if (updateError) throw updateError;
+        } else if (error) {
+          throw error;
+        }
       }
 
       toast.success("Settings updated successfully");

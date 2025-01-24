@@ -30,7 +30,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         .single();
 
       if (profileError) {
-        console.error('Error fetching profile:', profileError);
         throw profileError;
       }
 
@@ -47,7 +46,6 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
         .maybeSingle();
 
       if (adminError) {
-        console.error('Error fetching admin profile:', adminError);
         throw adminError;
       }
 
@@ -62,7 +60,56 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
     }
   };
 
-  const getRandomDelay = () => Math.floor(Math.random() * (15000 - 8000 + 1) + 8000);
+  const sendWhatsAppMessage = async (phoneNumber: string, message: string) => {
+    try {
+      const { data: { secret: apiToken }, error: secretError } = await supabase
+        .from('secrets')
+        .select('secret')
+        .eq('name', 'WHATSAPP_API_TOKEN')
+        .single();
+
+      if (secretError) throw secretError;
+
+      const response = await fetch('https://graph.facebook.com/v17.0/FROM_PHONE_NUMBER_ID/messages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to: phoneNumber,
+          type: "template",
+          template: {
+            name: "blood_donation_request",
+            language: {
+              code: "en"
+            },
+            components: [
+              {
+                type: "body",
+                parameters: [
+                  {
+                    type: "text",
+                    text: adminWhatsappNumber || ""
+                  }
+                ]
+              }
+            ]
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`WhatsApp API error: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error sending WhatsApp message:', error);
+      throw error;
+    }
+  };
 
   const handleBulkWhatsApp = async () => {
     if (!adminWhatsappNumber) {
@@ -97,30 +144,30 @@ const BulkMessageControl = ({ selectedDonors, donors, onComplete }: BulkMessageC
 
       if (error) throw error;
 
-      // Send messages with random delays
+      // Send messages with delays
       for (let i = 0; i < selectedDonorsList.length; i++) {
         const donor = selectedDonorsList[i];
         const phoneNumber = donor.phone.replace(/\D/g, '');
-        const message = encodeURIComponent(`Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`);
         
-        // Update progress
         setProgress(Math.round(((i + 1) / selectedDonorsList.length) * 100));
         
-        // Use the WhatsApp API URL format
-        const whatsappUrl = `https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${message}&type=phone_number&app_absent=0`;
-        window.open(whatsappUrl, '_blank');
+        try {
+          await sendWhatsAppMessage(
+            phoneNumber,
+            `Need blood donation. Please contact admin at: wa.me/${adminWhatsappNumber}`
+          );
+          toast.success(`Message sent to ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
+        } catch (error) {
+          toast.error(`Failed to send message to ${donor.name}`);
+        }
         
-        toast.success(`Opening WhatsApp for ${donor.name} (${i + 1}/${selectedDonorsList.length})`);
-        
-        // Add random delay between messages
+        // Add delay between messages
         if (i < selectedDonorsList.length - 1) {
-          const delay = getRandomDelay();
-          toast.info(`Waiting ${Math.round(delay/1000)} seconds before sending next message...`);
-          await new Promise(resolve => setTimeout(resolve, delay));
+          await new Promise(resolve => setTimeout(resolve, 1000));
         }
       }
 
-      toast.success(`WhatsApp opened for all ${selectedDonors.length} donors`);
+      toast.success(`Messages sent to all ${selectedDonors.length} donors`);
       onComplete();
     } catch (error) {
       console.error('Error sending messages:', error);

@@ -9,7 +9,7 @@ import BulkMessageControl from "./donors/BulkMessageControl";
 const BloodGroupDirectory = () => {
   const [donors, setDonors] = useState([]);
   const [selectedDonors, setSelectedDonors] = useState([]);
-  const [searchBloodGroup, setSearchBloodGroup] = useState("");
+  const [searchBloodGroup, setSearchBloodGroup] = useState("_all");
   const [searchCity, setSearchCity] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (searchBloodGroup && searchBloodGroup !== "all") {
+      if (searchBloodGroup && searchBloodGroup !== "_all") {
         query = query.eq('blood_group', searchBloodGroup);
       }
       

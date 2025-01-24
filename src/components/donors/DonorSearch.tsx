@@ -26,7 +26,7 @@ const DonorSearch = ({
             position="popper" 
             sideOffset={4}
           >
-            <SelectItem value="all">All Blood Groups</SelectItem>
+            <SelectItem value="_all">All Blood Groups</SelectItem>
             {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
               <SelectItem key={group} value={group}>
                 {group}

@@ -12,7 +12,13 @@ const Directory = () => {
 
   const formatBloodGroup = (group: string) => {
     if (group === "_all") return "All Groups";
-    return <span className="text-primary font-semibold">{group}</span>;
+    return (
+      <div className="flex items-center gap-3">
+        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-primary text-primary font-semibold">
+          {group}
+        </span>
+      </div>
+    );
   };
 
   return (
@@ -30,8 +36,10 @@ const Directory = () => {
           {Object.entries(bloodGroupCounts).map(([group, count]) => (
             <Card key={group}>
               <CardContent className="p-4">
-                <p className="text-sm text-gray-600">{formatBloodGroup(group)}</p>
-                <p className="text-2xl font-bold">{count}</p>
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-600">{formatBloodGroup(group)}</div>
+                  <p className="text-2xl font-bold">{count}</p>
+                </div>
               </CardContent>
             </Card>
           ))}

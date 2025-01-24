@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAuth } from "@/components/AuthProvider";
-import { Send } from "lucide-react";
+import { Send, MessageSquare } from "lucide-react";
 
 const Directory = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,6 +68,29 @@ const Directory = () => {
     }
   };
 
+  const handleSendBulkWhatsApp = async () => {
+    try {
+      const filteredDonors = donors?.filter((donor) =>
+        donor.blood_group.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
+      if (!filteredDonors || filteredDonors.length === 0) {
+        toast.error("No donors found matching the blood group");
+        return;
+      }
+
+      // Send messages to all filtered donors
+      for (const donor of filteredDonors) {
+        await handleSendWhatsApp(donor);
+      }
+
+      toast.success(`Sent messages to ${filteredDonors.length} donors`);
+    } catch (error) {
+      console.error("Error sending bulk WhatsApp messages:", error);
+      toast.error("Failed to send some WhatsApp messages");
+    }
+  };
+
   const filteredDonors = donors?.filter((donor) =>
     donor.blood_group.toLowerCase().includes(searchTerm.toLowerCase()) ||
     donor.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,7 +103,7 @@ const Directory = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
+      <div className="mb-6 flex gap-4 items-center">
         <Input
           type="text"
           placeholder="Search by blood group, city, or name..."
@@ -88,6 +111,15 @@ const Directory = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-md"
         />
+        {isAdmin && searchTerm && (
+          <Button
+            onClick={handleSendBulkWhatsApp}
+            className="flex items-center gap-2"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Notify All Matching Donors
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

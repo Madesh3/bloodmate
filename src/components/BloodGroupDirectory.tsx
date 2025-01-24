@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true }); // Add consistent ordering
+        .order('created_at', { ascending: false }); // Changed to descending order
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);

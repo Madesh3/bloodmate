@@ -81,8 +81,6 @@ export type Database = {
           id: string
           is_admin: boolean | null
           whatsapp_number: string | null
-          whatsapp_delay: number | null
-          max_bulk_messages: number | null
         }
         Insert: {
           created_at?: string
@@ -90,8 +88,6 @@ export type Database = {
           id: string
           is_admin?: boolean | null
           whatsapp_number?: string | null
-          whatsapp_delay?: number | null
-          max_bulk_messages?: number | null
         }
         Update: {
           created_at?: string
@@ -99,8 +95,6 @@ export type Database = {
           id?: string
           is_admin?: boolean | null
           whatsapp_number?: string | null
-          whatsapp_delay?: number | null
-          max_bulk_messages?: number | null
         }
         Relationships: []
       }
@@ -119,8 +113,6 @@ export type Database = {
     }
   }
 }
-
-type PublicSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
   PublicTableNameOrOptions extends
@@ -189,30 +181,4 @@ export type TablesUpdate<
       : never
     : never
 
-export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
-    | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
-    | { schema: keyof Database },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
-  }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
+type PublicSchema = Database[Extract<keyof Database, "public">]

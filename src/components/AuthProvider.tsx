@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
@@ -20,7 +21,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminStatus(session.user.id);
+        checkAndCreateProfile(session.user);
       }
     });
 
@@ -28,7 +29,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        checkAdminStatus(session.user.id);
+        checkAndCreateProfile(session.user);
       } else {
         setIsAdmin(false);
       }
@@ -39,15 +40,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', userId)
-      .single();
+  const checkAndCreateProfile = async (user: User) => {
+    try {
+      // First try to get the existing profile
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .maybeSingle();
 
-    if (!error && data) {
-      setIsAdmin(data.is_admin);
+      if (error) throw error;
+
+      if (!profile) {
+        // Create profile if it doesn't exist
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            is_admin: false
+          });
+
+        if (insertError) throw insertError;
+        setIsAdmin(false);
+      } else {
+        setIsAdmin(profile.is_admin || false);
+      }
+    } catch (error) {
+      console.error('Error managing profile:', error);
+      toast.error("Failed to load user profile");
     }
   };
 

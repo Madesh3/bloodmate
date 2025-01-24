@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Heart, Menu, LogOut } from "lucide-react";
+import { Heart, Menu, LogOut, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import MobileNavigation from "./MobileNavigation";
@@ -55,7 +55,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
               {user ? (
                 <>
                   {isAdmin && (
-                    <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
+                    <>
+                      <Link to="/admin" className="text-gray-600 hover:text-gray-900">Admin</Link>
+                      <Link to="/settings" className="text-gray-600 hover:text-gray-900">
+                        <Settings className="h-4 w-4 inline-block mr-1" />
+                        Settings
+                      </Link>
+                    </>
                   )}
                   <Button variant="ghost" size="sm" onClick={handleSignOut}>
                     <LogOut className="h-4 w-4 mr-2" />
@@ -88,7 +94,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
                   {user ? (
                     <>
                       {isAdmin && (
-                        <Link to="/admin" className="text-lg">Admin</Link>
+                        <>
+                          <Link to="/admin" className="text-lg">Admin</Link>
+                          <Link to="/settings" className="text-lg flex items-center">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Settings
+                          </Link>
+                        </>
                       )}
                       <Button variant="ghost" onClick={handleSignOut}>
                         <LogOut className="h-4 w-4 mr-2" />

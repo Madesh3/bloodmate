@@ -39,6 +39,41 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          donor_id: string
+          id: string
+          message_text: string
+          message_type: string | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          donor_id: string
+          id?: string
+          message_text: string
+          message_type?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          donor_id?: string
+          id?: string
+          message_text?: string
+          message_type?: string | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

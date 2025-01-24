@@ -9,17 +9,26 @@ interface BloodGroupCount {
 const Directory = () => {
   const [donorsCount, setDonorsCount] = useState<number>(0);
   const [bloodGroupCounts, setBloodGroupCounts] = useState<BloodGroupCount>({});
+  const [selectedGroup, setSelectedGroup] = useState<string>("_all");
 
   const formatBloodGroup = (group: string) => {
     if (group === "_all") return "All Groups";
     return (
       <div className="flex items-center gap-3">
-        <span className="inline-flex items-center justify-center w-10 h-10 rounded-full border-2 border-[#FFDEE2] bg-[#FDE1D3] text-primary font-semibold shadow-sm hover:shadow-md transition-shadow">
+        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 
+          ${selectedGroup === group || selectedGroup === "_all" 
+            ? "border-[#FFDEE2] bg-[#FDE1D3] text-primary" 
+            : "border-gray-200 bg-gray-100 text-gray-400"} 
+          font-semibold shadow-sm transition-all`}
+        >
           {group}
         </span>
       </div>
     );
   };
+
+  // All blood groups that we want to display
+  const allBloodGroups = ["_all", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   return (
     <div className="container mx-auto px-4 py-8 space-y-8 max-w-7xl">
@@ -40,12 +49,19 @@ const Directory = () => {
               </div>
             </CardContent>
           </Card>
-          {Object.entries(bloodGroupCounts).map(([group, count]) => (
-            <Card key={group} className="hover:shadow-lg transition-shadow">
+          {allBloodGroups.map((group) => (
+            <Card 
+              key={group} 
+              className={`hover:shadow-lg transition-shadow cursor-pointer
+                ${selectedGroup === group ? "ring-2 ring-primary" : "opacity-75"}`}
+              onClick={() => setSelectedGroup(group)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                  <p className="text-2xl font-bold text-primary">{count}</p>
+                  <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-gray-400"}`}>
+                    {bloodGroupCounts[group] || 0}
+                  </p>
                 </div>
               </CardContent>
             </Card>

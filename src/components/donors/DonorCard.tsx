@@ -3,10 +3,22 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, MessageSquare, Phone } from "lucide-react";
+import { Pencil, Trash2, MessageSquare, Phone, Trophy, Medal, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+
+const getDonorBadge = (donationCount: number) => {
+  if (donationCount >= 10) {
+    return { icon: Trophy, label: "Platinum Donor", color: "bg-purple-100 text-purple-800" };
+  } else if (donationCount >= 5) {
+    return { icon: Medal, label: "Gold Donor", color: "bg-yellow-100 text-yellow-800" };
+  } else if (donationCount >= 3) {
+    return { icon: Star, label: "Silver Donor", color: "bg-gray-100 text-gray-800" };
+  }
+  return null;
+};
 
 interface DonorCardProps {
   donor: any;
@@ -26,6 +38,7 @@ const DonorCard = ({
   onSelect
 }: DonorCardProps) => {
   const [editingDonor, setEditingDonor] = useState<any>(null);
+  const donorBadge = getDonorBadge(donor.donation_count || 0);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +50,8 @@ const DonorCard = ({
           city: editingDonor.city,
           phone: editingDonor.phone,
           email: editingDonor.email,
-          blood_group: editingDonor.blood_group
+          blood_group: editingDonor.blood_group,
+          donation_count: editingDonor.donation_count
         })
         .eq('id', donor.id);
 
@@ -53,7 +67,7 @@ const DonorCard = ({
   };
 
   const handleWhatsAppMessage = () => {
-    const phoneNumber = donor.phone.replace(/\D/g, ''); // Remove non-digits
+    const phoneNumber = donor.phone.replace(/\D/g, '');
     const whatsappUrl = `https://wa.me/${phoneNumber}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -107,6 +121,14 @@ const DonorCard = ({
               ))}
             </SelectContent>
           </Select>
+          <Input
+            type="number"
+            value={editingDonor.donation_count || 0}
+            onChange={(e) => setEditingDonor({ ...editingDonor, donation_count: parseInt(e.target.value) })}
+            placeholder="Number of Donations"
+            min="0"
+            className="mb-2"
+          />
           <div className="flex gap-2 mt-4">
             <Button type="submit">Save</Button>
             <Button variant="outline" onClick={() => setEditingDonor(null)}>Cancel</Button>
@@ -128,8 +150,21 @@ const DonorCard = ({
             />
           )}
           <div>
-            <h3 className="font-medium">{donor.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium">{donor.name}</h3>
+              {donorBadge && (
+                <Badge className={`${donorBadge.color} flex items-center gap-1`}>
+                  <donorBadge.icon className="w-3 h-3" />
+                  {donorBadge.label}
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-gray-600">{donor.city}</p>
+            {donor.donation_count > 0 && (
+              <p className="text-xs text-gray-500 mt-1">
+                Donations: {donor.donation_count}
+              </p>
+            )}
           </div>
         </div>
         <span className="text-primary font-bold">{donor.blood_group}</span>

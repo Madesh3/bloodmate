@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Pencil, Trash2, MessageSquare, Mail } from "lucide-react";
+import { Pencil, Trash2, MessageSquare } from "lucide-react";
 
 interface DonorCardProps {
   donor: {
@@ -35,7 +35,7 @@ const DonorCard = ({
   };
 
   return (
-    <Card key={donor.id} className="p-4 hover:shadow-md transition-shadow bg-white relative">
+    <Card key={donor.id} className="p-6 hover:shadow-md transition-shadow bg-white relative">
       {editingDonor?.id === donor.id ? (
         <form onSubmit={(e) => handleUpdate(e, donor.id)} className="space-y-4">
           <Input
@@ -85,54 +85,50 @@ const DonorCard = ({
         </form>
       ) : (
         <>
-          <div className="flex justify-between items-start">
+          <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-medium">{donor.name}</h3>
-              <p className="text-sm text-gray-600">{donor.city}</p>
+              <h3 className="text-xl font-medium">Donor {donor.name}</h3>
+              <p className="text-gray-600 mt-1">{donor.city}</p>
             </div>
-            <span className="text-primary font-bold">{donor.blood_group}</span>
+            <span className="text-red-500 font-bold text-xl">{donor.blood_group}</span>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
-            {user ? (
-              <>
-                <p>Contact: {donor.phone}</p>
-                <p>Email: {donor.email}</p>
-                <div className="mt-4 flex gap-2 items-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setEditingDonor(donor)}
-                  >
-                    <Pencil className="w-4 h-4 mr-1" /> Edit
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => handleDelete(donor.id)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" /> Delete
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.location.href = `mailto:${donor.email}`}
-                  >
-                    <Mail className="w-4 h-4 mr-1" /> Email
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
-                    className="bg-green-500 text-white hover:bg-green-600"
-                  >
-                    <MessageSquare className="w-4 h-4 mr-1" /> WhatsApp
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <p className="text-primary">Sign in to view contact details</p>
-            )}
-          </div>
+          
+          {user ? (
+            <>
+              <div className="space-y-2 mb-6">
+                <p className="text-gray-700">Contact: {donor.phone}</p>
+                <p className="text-gray-700">Email: {donor.email}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => setEditingDonor(donor)}
+                >
+                  <Pencil className="w-4 h-4" /> Edit
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                  onClick={() => handleDelete(donor.id)}
+                >
+                  <Trash2 className="w-4 h-4" /> Delete
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
+                  className="bg-green-500 text-white hover:bg-green-600 flex items-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" /> Message
+                </Button>
+              </div>
+            </>
+          ) : (
+            <p className="text-primary mt-4">Sign in to view contact details</p>
+          )}
         </>
       )}
     </Card>

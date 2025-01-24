@@ -230,6 +230,14 @@ const BloodGroupDirectory = () => {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => window.location.href = `mailto:${donor.email}`}
+                          className="flex items-center gap-1"
+                        >
+                          <MessageSquare className="w-4 h-4" /> Message
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           asChild
                           className="flex items-center gap-1 bg-green-500 text-white hover:bg-green-600"
                         >

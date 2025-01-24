@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, MessageSquare, Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "./AuthProvider";
@@ -24,7 +24,7 @@ const BloodGroupDirectory = () => {
     try {
       let query = supabase.from('donors')
         .select('*')
-        .order('created_at', { ascending: true }); // Add consistent ordering
+        .order('created_at', { ascending: true });
 
       if (searchBloodGroup && searchBloodGroup !== "all") {
         query = query.eq('blood_group', searchBloodGroup);
@@ -92,7 +92,6 @@ const BloodGroupDirectory = () => {
 
       if (error) throw error;
 
-      // Update the donor in the local state instead of fetching all donors again
       setDonors(prevDonors => 
         prevDonors.map(donor => 
           donor.id === id ? { ...donor, ...editingDonor } : donor
@@ -105,6 +104,12 @@ const BloodGroupDirectory = () => {
       console.error('Error updating donor:', error);
       toast.error("Failed to update donor");
     }
+  };
+
+  const getWhatsAppLink = (phone: string) => {
+    const message = encodeURIComponent("We need Blood, can you help?");
+    const cleanPhone = phone.replace(/\D/g, '');
+    return `https://wa.me/${cleanPhone}?text=${message}`;
   };
 
   if (isLoading) {
@@ -205,22 +210,35 @@ const BloodGroupDirectory = () => {
                     <>
                       <p>Contact: {donor.phone}</p>
                       <p>Email: {donor.email}</p>
-                      <div className="mt-4 flex gap-2">
+                      <div className="mt-4 flex gap-2 items-center">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => setEditingDonor(donor)}
-                          className="flex items-center gap-1"
                         >
-                          <Pencil className="w-4 h-4" /> Edit
+                          <Pencil className="w-4 h-4 mr-1" /> Edit
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
                           onClick={() => handleDelete(donor.id)}
-                          className="flex items-center gap-1"
                         >
-                          <Trash2 className="w-4 h-4" /> Delete
+                          <Trash2 className="w-4 h-4 mr-1" /> Delete
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.location.href = `mailto:${donor.email}`}
+                        >
+                          <Mail className="w-4 h-4 mr-1" /> Email
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(getWhatsAppLink(donor.phone), '_blank')}
+                          className="bg-green-500 text-white hover:bg-green-600"
+                        >
+                          <MessageSquare className="w-4 h-4 mr-1" /> WhatsApp
                         </Button>
                       </div>
                     </>

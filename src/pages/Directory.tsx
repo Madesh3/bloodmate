@@ -26,8 +26,8 @@ const Directory = () => {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Blood Donor Directory</h1>
         
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <Card className="sm:col-span-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+          <Card className="col-span-3 sm:col-span-4">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600">Total Donors</p>

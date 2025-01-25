@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "./AuthProvider";
-import DonorSearch from "./donors/DonorSearch";
 import DonorsList from "./donors/DonorsList";
 import BulkMessageControl from "./donors/BulkMessageControl";
 import { useDonors } from "@/hooks/useDonors";
@@ -66,15 +65,6 @@ const BloodGroupDirectory = ({
 
   return (
     <div className="w-full max-w-4xl space-y-6">
-      <DonorSearch
-        searchCity={searchCity}
-        setSearchCity={setSearchCity}
-        onSelectAll={handleSelectAll}
-        allSelected={areAllSelected}
-        donorsCount={donors.length}
-        totalDonorsCount={totalDonorsCount}
-      />
-
       {user && selectedDonors.length > 0 && (
         <BulkMessageControl
           selectedDonors={selectedDonors}

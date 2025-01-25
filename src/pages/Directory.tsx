@@ -1,6 +1,7 @@
 import BloodGroupDirectory from "@/components/BloodGroupDirectory";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
+import DonorSearch from "@/components/donors/DonorSearch";
 
 interface BloodGroupCount {
   [key: string]: number;
@@ -11,6 +12,7 @@ const Directory = () => {
   const [bloodGroupCounts, setBloodGroupCounts] = useState<BloodGroupCount>({});
   const [selectedGroup, setSelectedGroup] = useState<string>("");
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
+  const [searchCity, setSearchCity] = useState("");
 
   // All blood groups that we want to display
   const allBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -46,10 +48,21 @@ const Directory = () => {
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Find and connect with blood donors in your area. Use the filters below to search by blood group and location.
+            Find and connect with blood donors in your area. Use the search below to find donors near you.
           </p>
         </div>
+
+        {/* Search Bar Section */}
+        <div className="max-w-2xl mx-auto">
+          <DonorSearch
+            searchCity={searchCity}
+            setSearchCity={setSearchCity}
+            donorsCount={donorsCount}
+            totalDonorsCount={donorsCount}
+          />
+        </div>
         
+        {/* Blood Group Cards */}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
           <Card className="col-span-3 sm:col-span-4 border-2 border-[#FFDEE2] bg-[#FDE1D3] hover:shadow-lg transition-shadow">
             <CardContent className="p-6">

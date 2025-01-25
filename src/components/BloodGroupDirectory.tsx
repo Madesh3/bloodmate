@@ -67,8 +67,6 @@ const BloodGroupDirectory = ({
   return (
     <div className="w-full max-w-4xl space-y-6">
       <DonorSearch
-        searchBloodGroup={searchBloodGroup}
-        setSearchBloodGroup={setSearchBloodGroup}
         searchCity={searchCity}
         setSearchCity={setSearchCity}
         onSelectAll={handleSelectAll}

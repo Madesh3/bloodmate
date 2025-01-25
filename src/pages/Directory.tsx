@@ -51,8 +51,8 @@ const Directory = () => {
             <p className="text-center flex items-baseline gap-2">
               <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
               <span className="text-gray-600 text-sm md:text-base flex flex-col items-start">
-                <span className="text-primary/90 font-medium">Heros</span>
-                <span className="flex items-center gap-1">
+                <span className="text-primary/90 font-medium absolute -mt-4">Heros</span>
+                <span className="flex items-center gap-1 mt-2">
                   Total <span className="line-through">Donors</span> Available
                 </span>
               </span>

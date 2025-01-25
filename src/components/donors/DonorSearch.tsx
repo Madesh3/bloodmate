@@ -30,7 +30,7 @@ const DonorSearch = ({
           <div className="relative bg-white shadow-xl rounded-lg">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary h-5 w-5" />
             <Input
-              placeholder="Search donors near you (e.g. Andheri, Mumbai, 400053)..."
+              placeholder="Search donors near you"
               value={searchCity}
               onChange={(e) => setSearchCity(e.target.value)}
               className="pl-12 pr-4 py-6 text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"

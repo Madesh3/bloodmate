@@ -14,8 +14,8 @@ const canadianCities = [
   "Toronto, Ontario", "Vancouver, British Columbia", "Montreal, Quebec",
   "Calgary, Alberta", "Edmonton, Alberta", "Ottawa, Ontario",
   "Winnipeg, Manitoba", "Halifax, Nova Scotia", "Quebec City, Quebec",
-  "Victoria, British Columbia", "Regina, Saskatchewan", "St. John's, Newfoundland",
-  "Saskatoon, Saskatchewan", "Hamilton, Ontario", "London, Ontario"
+  "Victoria, British Columbia", "Calgary, Alberta", "St. John's, Newfoundland",
+  "Vancouver, British Columbia", "Hamilton, Ontario", "London, Ontario"
 ];
 
 const getRandomName = () => {

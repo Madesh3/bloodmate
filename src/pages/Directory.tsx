@@ -47,14 +47,11 @@ const Directory = () => {
       <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-8 max-w-7xl">
         {/* Total Donors Count Badge */}
         <div className="flex justify-center">
-          <div className="bg-white shadow-lg rounded-lg px-6 py-3 border-2 border-primary/20">
-            <div className="flex flex-col items-center">
+          <div className="bg-white shadow-lg rounded-full px-6 py-3 border-2 border-primary/20">
+            <p className="text-center">
               <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
-              <div className="flex flex-col items-center -space-y-0.5">
-                <p className="text-xs font-medium text-primary/80">Heros</p>
-                <p className="text-xs text-gray-500 line-through opacity-70">donors</p>
-              </div>
-            </div>
+              <span className="text-gray-600 ml-2 text-sm md:text-base">Total Donors Available</span>
+            </p>
           </div>
         </div>
 
@@ -90,7 +87,7 @@ const Directory = () => {
               </div>
             </div>
 
-            {/* Blood Groups Grid */}
+            {/* Blood Groups Grid - Now 3 columns on mobile */}
             <div className="mt-6 px-2">
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
                 {allBloodGroups.map((group) => (

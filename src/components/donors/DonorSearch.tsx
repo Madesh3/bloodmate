@@ -4,8 +4,6 @@ import { useAuth } from "@/components/AuthProvider";
 import { Search } from "lucide-react";
 
 interface DonorSearchProps {
-  searchBloodGroup: string;
-  setSearchBloodGroup: (value: string) => void;
   searchCity: string;
   setSearchCity: (value: string) => void;
   onSelectAll?: (checked: boolean) => void;
@@ -26,17 +24,26 @@ const DonorSearch = ({
 
   return (
     <div className="space-y-4">
-      <div className="relative">
+      <div className="relative max-w-2xl mx-auto">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-          <Input
-            placeholder="Search by city, area or pincode..."
-            value={searchCity}
-            onChange={(e) => setSearchCity(e.target.value)}
-            className="bg-white pl-10 w-full"
-          />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl"></div>
+          <div className="relative bg-white shadow-xl rounded-lg">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary h-5 w-5" />
+            <Input
+              placeholder="Search donors near you (e.g. Andheri, Mumbai, 400053)..."
+              value={searchCity}
+              onChange={(e) => setSearchCity(e.target.value)}
+              className="pl-12 pr-4 py-6 text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"
+            />
+          </div>
+          {searchCity && (
+            <p className="text-sm text-gray-600 mt-2 ml-2">
+              Showing results near "{searchCity}"
+            </p>
+          )}
         </div>
       </div>
+      
       {user && donorsCount > 0 && (
         <div className="flex items-center space-x-2 bg-white p-2 rounded-lg">
           <Checkbox

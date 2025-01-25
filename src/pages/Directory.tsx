@@ -20,11 +20,11 @@ const Directory = () => {
   const formatBloodGroup = (group: string) => {
     return (
       <div className="flex items-center gap-3">
-        <span className={`inline-flex items-center justify-center w-12 h-12 rounded-full border-2 
+        <span className={`inline-flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 
           ${selectedGroup === group 
             ? "border-primary bg-[#FFF1F2] text-primary shadow-lg scale-110 transition-all" 
             : "border-[#FFDEE2] bg-[#FFF5F5] text-primary/70 hover:scale-105 transition-all"} 
-          font-semibold text-lg`}
+          font-semibold text-base md:text-lg`}
         >
           {group}
         </span>
@@ -44,12 +44,22 @@ const Directory = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-red-50">
-      <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-12 max-w-7xl">
-        {/* Hero Section with Search */}
+      <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-8 max-w-7xl">
+        {/* Total Donors Count Badge */}
+        <div className="flex justify-center">
+          <div className="bg-white shadow-lg rounded-full px-6 py-3 border-2 border-primary/20">
+            <p className="text-center">
+              <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
+              <span className="text-gray-600 ml-2 text-sm md:text-base">Total Donors Available</span>
+            </p>
+          </div>
+        </div>
+
+        {/* Hero Section with Search and Blood Groups */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-red-50 rounded-3xl blur-3xl opacity-50"></div>
-          <div className="relative space-y-4 md:space-y-8 py-4 md:py-8">
-            <div className="text-center space-y-2 md:space-y-4">
+          <div className="relative space-y-4 md:space-y-6 py-4 md:py-6">
+            <div className="text-center">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
               <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4">
                 Find and connect with blood donors in your area. Use the search below to find donors near you.
@@ -75,42 +85,38 @@ const Directory = () => {
                   </p>
                 )}
               </div>
-              <div className="text-sm text-gray-500 text-center mt-4">
-                {donorsCount} donors available
+            </div>
+
+            {/* Blood Groups Grid - Now 3 columns on mobile */}
+            <div className="mt-6 px-2">
+              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
+                {allBloodGroups.map((group) => (
+                  <Card 
+                    key={group} 
+                    className={`hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1
+                      ${selectedGroup === group 
+                        ? "ring-2 ring-primary shadow-lg border-primary bg-white" 
+                        : "border-[#FFDEE2] hover:border-primary/50 bg-white/80"}`}
+                    onClick={() => handleGroupSelect(group)}
+                  >
+                    <CardContent className="p-2 md:p-4">
+                      <div className="flex flex-col items-center justify-center space-y-1 md:space-y-2">
+                        <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
+                        <p className={`text-lg md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
+                          {bloodGroupCounts[group] || 0}
+                        </p>
+                        <p className="text-xs text-gray-500">donors</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </div>
           </div>
         </div>
-        
-        {/* Blood Group Stats Section */}
-        <div className="space-y-4 md:space-y-6 mb-6">
-          <h2 className="text-xl md:text-2xl font-semibold text-gray-800 text-center">Blood Groups Available</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4 px-2">
-            {allBloodGroups.map((group) => (
-              <Card 
-                key={group} 
-                className={`hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1
-                  ${selectedGroup === group 
-                    ? "ring-2 ring-primary shadow-lg border-primary bg-white" 
-                    : "border-[#FFDEE2] hover:border-primary/50 bg-white/80"}`}
-                onClick={() => handleGroupSelect(group)}
-              >
-                <CardContent className="p-3 md:p-4">
-                  <div className="flex flex-col items-center justify-center space-y-1 md:space-y-2">
-                    <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                    <p className={`text-xl md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
-                      {bloodGroupCounts[group] || 0}
-                    </p>
-                    <p className="text-xs text-gray-500">donors</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
       </div>
       
-      {/* Donors List Section - Now with proper mobile spacing */}
+      {/* Donors List Section */}
       <div className="flex justify-center pb-24 md:pb-12 px-4">
         <BloodGroupDirectory 
           onDonorsCountChange={setDonorsCount}

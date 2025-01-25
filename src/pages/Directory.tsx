@@ -47,7 +47,7 @@ const Directory = () => {
       <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-8 max-w-7xl">
         {/* Total Donors Count Badge */}
         <div className="flex justify-center">
-          <div className="bg-white shadow-lg rounded-full px-6 py-3 border-2 border-primary/20">
+          <div className="bg-white shadow-lg rounded-lg px-6 py-3 border-2 border-primary/20">
             <div className="flex flex-col items-center">
               <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
               <div className="flex flex-col items-center -space-y-0.5">

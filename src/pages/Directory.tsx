@@ -15,7 +15,6 @@ const Directory = () => {
   const [searchBloodGroup, setSearchBloodGroup] = useState("");
   const [searchCity, setSearchCity] = useState("");
 
-  // All blood groups that we want to display
   const allBloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
   const formatBloodGroup = (group: string) => {
@@ -45,20 +44,20 @@ const Directory = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-red-50">
-      <div className="container mx-auto px-4 py-12 space-y-12 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-12 max-w-7xl">
         {/* Hero Section with Search */}
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-red-50 rounded-3xl blur-3xl opacity-50"></div>
-          <div className="relative space-y-8 py-8">
-            <div className="text-center space-y-4">
-              <h1 className="text-5xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
-              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <div className="relative space-y-4 md:space-y-8 py-4 md:py-8">
+            <div className="text-center space-y-2 md:space-y-4">
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
+              <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto px-4">
                 Find and connect with blood donors in your area. Use the search below to find donors near you.
               </p>
             </div>
 
             {/* Search Bar Section */}
-            <div className="relative max-w-2xl mx-auto">
+            <div className="relative max-w-2xl mx-auto px-4">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl"></div>
                 <div className="relative bg-white shadow-xl rounded-lg">
@@ -67,7 +66,7 @@ const Directory = () => {
                     placeholder="Search donors near you (e.g. Andheri, Mumbai, 400053)..."
                     value={searchCity}
                     onChange={(e) => setSearchCity(e.target.value)}
-                    className="pl-12 pr-4 py-6 text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"
+                    className="pl-12 pr-4 py-6 text-base md:text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"
                   />
                 </div>
                 {searchCity && (
@@ -84,9 +83,9 @@ const Directory = () => {
         </div>
         
         {/* Blood Group Stats Section */}
-        <div className="space-y-6">
-          <h2 className="text-2xl font-semibold text-gray-800 text-center">Blood Groups Available</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+        <div className="space-y-4 md:space-y-6 mb-6">
+          <h2 className="text-xl md:text-2xl font-semibold text-gray-800 text-center">Blood Groups Available</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 md:gap-4 px-2">
             {allBloodGroups.map((group) => (
               <Card 
                 key={group} 
@@ -96,10 +95,10 @@ const Directory = () => {
                     : "border-[#FFDEE2] hover:border-primary/50 bg-white/80"}`}
                 onClick={() => handleGroupSelect(group)}
               >
-                <CardContent className="p-4">
-                  <div className="flex flex-col items-center justify-center space-y-2">
+                <CardContent className="p-3 md:p-4">
+                  <div className="flex flex-col items-center justify-center space-y-1 md:space-y-2">
                     <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                    <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
+                    <p className={`text-xl md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
                       {bloodGroupCounts[group] || 0}
                     </p>
                     <p className="text-xs text-gray-500">donors</p>
@@ -111,7 +110,8 @@ const Directory = () => {
         </div>
       </div>
       
-      <div className="flex justify-center pb-12">
+      {/* Donors List Section - Now with proper mobile spacing */}
+      <div className="flex justify-center pb-24 md:pb-12 px-4">
         <BloodGroupDirectory 
           onDonorsCountChange={setDonorsCount}
           onBloodGroupCountsChange={setBloodGroupCounts}

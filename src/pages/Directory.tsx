@@ -46,13 +46,15 @@ const Directory = () => {
     <div className="min-h-screen bg-gradient-to-b from-white to-red-50">
       <div className="container mx-auto px-4 py-6 md:py-12 space-y-6 md:space-y-8 max-w-7xl">
         {/* Total Donors Count Badge */}
+
+        {/* Total Donors Count Badge */}
         <div className="flex justify-center">
           <div className="bg-white shadow-lg rounded-xl px-6 py-3 border-2 border-primary/20">
             <p className="text-center flex flex-col items-center">
               <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
               <span className="text-gray-600 text-sm md:text-base">
                 <span className="block font-medium">Heros</span>
-                <span className="line-through">donors</span>
+                Total <span className="line-through">Donors</span> Available
               </span>
             </p>
           </div>

@@ -87,7 +87,7 @@ const Directory = () => {
               </div>
             </div>
 
-            {/* Blood Groups Grid - Now 3 columns on mobile */}
+            {/* Blood Groups Grid */}
             <div className="mt-6 px-2">
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
                 {allBloodGroups.map((group) => (
@@ -106,7 +106,10 @@ const Directory = () => {
                           <p className={`text-lg md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
                             {bloodGroupCounts[group] || 0}
                           </p>
-                          <p className="text-xs text-gray-500">donors</p>
+                          <div className="flex flex-col items-center -space-y-0.5">
+                            <p className="text-xs font-medium text-primary/80">Heros</p>
+                            <p className="text-xs text-gray-500 line-through opacity-70">donors</p>
+                          </div>
                         </div>
                       </div>
                     </CardContent>

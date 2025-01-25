@@ -100,12 +100,14 @@ const Directory = () => {
                     onClick={() => handleGroupSelect(group)}
                   >
                     <CardContent className="p-2 md:p-4">
-                      <div className="flex flex-col items-center justify-center space-y-1 md:space-y-2">
+                      <div className="flex flex-col items-center justify-center space-y-1">
                         <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                        <p className={`text-lg md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
-                          {bloodGroupCounts[group] || 0}
-                        </p>
-                        <p className="text-xs text-gray-500">donors</p>
+                        <div className="flex flex-col items-center -space-y-1">
+                          <p className={`text-lg md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
+                            {bloodGroupCounts[group] || 0}
+                          </p>
+                          <p className="text-xs text-gray-500">donors</p>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

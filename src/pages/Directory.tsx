@@ -48,10 +48,10 @@ const Directory = () => {
         {/* Total Donors Count Badge */}
         <div className="flex justify-center">
           <div className="bg-white shadow-lg rounded-full px-6 py-3 border-2 border-primary/20">
-            <p className="text-center">
-              <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
-              <span className="text-gray-600 ml-2 text-sm md:text-base">Total Donors Available</span>
-            </p>
+            <div className="flex flex-col items-center">
+              <span className="text-4xl md:text-5xl font-bold text-primary">{donorsCount}</span>
+              <span className="text-gray-600 text-sm md:text-base mt-1">donors</span>
+            </div>
           </div>
         </div>
 

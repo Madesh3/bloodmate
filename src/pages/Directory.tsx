@@ -20,11 +20,11 @@ const Directory = () => {
   const formatBloodGroup = (group: string) => {
     return (
       <div className="flex items-center gap-3">
-        <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full border-2 
+        <span className={`inline-flex items-center justify-center w-12 h-12 rounded-full border-2 
           ${selectedGroup === group 
-            ? "border-primary bg-[#FFF1F2] text-primary shadow-lg" 
-            : "border-[#FFDEE2] bg-[#FFF5F5] text-primary/70"} 
-          font-semibold transition-all`}
+            ? "border-primary bg-[#FFF1F2] text-primary shadow-lg scale-110 transition-all" 
+            : "border-[#FFDEE2] bg-[#FFF5F5] text-primary/70 hover:scale-105 transition-all"} 
+          font-semibold text-lg`}
         >
           {group}
         </span>
@@ -35,66 +35,68 @@ const Directory = () => {
   const handleGroupSelect = (group: string) => {
     if (selectedGroup === group) {
       setSelectedGroup("");
-      setSearchBloodGroup("_all"); // Reset filter
+      setSearchBloodGroup("_all");
     } else {
       setSelectedGroup(group);
-      setSearchBloodGroup(group); // Apply filter
+      setSearchBloodGroup(group);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 space-y-8 max-w-7xl">
-      <div className="space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Find and connect with blood donors in your area. Use the search below to find donors near you.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-white to-red-50">
+      <div className="container mx-auto px-4 py-12 space-y-12 max-w-7xl">
+        {/* Hero Section with Search */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-100 to-red-50 rounded-3xl blur-3xl opacity-50"></div>
+          <div className="relative space-y-8 py-8">
+            <div className="text-center space-y-4">
+              <h1 className="text-5xl font-bold text-gray-900 mb-2">Blood Donor Directory</h1>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                Find and connect with blood donors in your area. Use the search below to find donors near you.
+              </p>
+            </div>
 
-        {/* Search Bar Section */}
-        <div className="max-w-2xl mx-auto">
-          <DonorSearch
-            searchCity={searchCity}
-            setSearchCity={setSearchCity}
-            donorsCount={donorsCount}
-            totalDonorsCount={donorsCount}
-          />
+            {/* Search Bar Section */}
+            <div className="max-w-2xl mx-auto">
+              <DonorSearch
+                searchCity={searchCity}
+                setSearchCity={setSearchCity}
+                donorsCount={donorsCount}
+                totalDonorsCount={donorsCount}
+              />
+            </div>
+          </div>
         </div>
         
-        {/* Blood Group Cards */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-          <Card className="col-span-3 sm:col-span-4 border-2 border-[#FFDEE2] bg-[#FDE1D3] hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium text-gray-800">Total Donors</p>
-                <p className="text-3xl font-bold text-primary">{donorsCount}</p>
-              </div>
-            </CardContent>
-          </Card>
-          {allBloodGroups.map((group) => (
-            <Card 
-              key={group} 
-              className={`hover:shadow-lg transition-all cursor-pointer
-                ${selectedGroup === group 
-                  ? "ring-2 ring-primary shadow-lg border-primary" 
-                  : "border-[#FFDEE2] hover:border-primary/50"}`}
-              onClick={() => handleGroupSelect(group)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
-                  <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
-                    {bloodGroupCounts[group] || 0}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Blood Group Stats Section */}
+        <div className="space-y-6">
+          <h2 className="text-2xl font-semibold text-gray-800 text-center">Blood Groups Available</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+            {allBloodGroups.map((group) => (
+              <Card 
+                key={group} 
+                className={`hover:shadow-xl transition-all cursor-pointer transform hover:-translate-y-1
+                  ${selectedGroup === group 
+                    ? "ring-2 ring-primary shadow-lg border-primary bg-white" 
+                    : "border-[#FFDEE2] hover:border-primary/50 bg-white/80"}`}
+                onClick={() => handleGroupSelect(group)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="text-sm font-medium text-gray-800">{formatBloodGroup(group)}</div>
+                    <p className={`text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
+                      {bloodGroupCounts[group] || 0}
+                    </p>
+                    <p className="text-xs text-gray-500">donors</p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
       
-      <div className="flex justify-center">
+      <div className="flex justify-center pb-12">
         <BloodGroupDirectory 
           onDonorsCountChange={setDonorsCount}
           onBloodGroupCountsChange={setBloodGroupCounts}

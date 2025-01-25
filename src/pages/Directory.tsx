@@ -2,6 +2,7 @@ import BloodGroupDirectory from "@/components/BloodGroupDirectory";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 interface BloodGroupCount {
   [key: string]: number;
@@ -57,18 +58,26 @@ const Directory = () => {
             </div>
 
             {/* Search Bar Section */}
-            <div className="max-w-2xl mx-auto">
-              <div className="flex flex-col space-y-4">
-                <Input
-                  type="text"
-                  placeholder="Search by city..."
-                  value={searchCity}
-                  onChange={(e) => setSearchCity(e.target.value)}
-                  className="w-full px-4 py-2 text-lg"
-                />
-                <div className="text-sm text-gray-500 text-center">
-                  {donorsCount} donors available
+            <div className="relative max-w-2xl mx-auto">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur-xl"></div>
+                <div className="relative bg-white shadow-xl rounded-lg">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary h-5 w-5" />
+                  <Input
+                    placeholder="Search donors near you (e.g. Andheri, Mumbai, 400053)..."
+                    value={searchCity}
+                    onChange={(e) => setSearchCity(e.target.value)}
+                    className="pl-12 pr-4 py-6 text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"
+                  />
                 </div>
+                {searchCity && (
+                  <p className="text-sm text-gray-600 mt-2 ml-2">
+                    Showing results near "{searchCity}"
+                  </p>
+                )}
+              </div>
+              <div className="text-sm text-gray-500 text-center mt-4">
+                {donorsCount} donors available
               </div>
             </div>
           </div>

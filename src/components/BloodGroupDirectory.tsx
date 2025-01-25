@@ -38,8 +38,9 @@ const BloodGroupDirectory = ({
   useEffect(() => {
     const getTotalCount = async () => {
       const count = await fetchTotalDonorsCount();
-      setDonorsCount(count);
-      onDonorsCountChange?.(count);
+      if (onDonorsCountChange) {
+        onDonorsCountChange(count);
+      }
     };
     getTotalCount();
   }, [fetchTotalDonorsCount, onDonorsCountChange]);

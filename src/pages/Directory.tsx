@@ -48,10 +48,13 @@ const Directory = () => {
         {/* Total Donors Count Badge */}
         <div className="flex justify-center">
           <div className="bg-white shadow-lg rounded-full px-6 py-3 border-2 border-primary/20">
-            <p className="text-center">
+            <div className="flex flex-col items-center">
               <span className="text-2xl md:text-3xl font-bold text-primary">{donorsCount}</span>
-              <span className="text-gray-600 ml-2 text-sm md:text-base">Total Donors Available</span>
-            </p>
+              <div className="flex flex-col items-center -space-y-0.5">
+                <p className="text-xs font-medium text-primary/80">Heros</p>
+                <p className="text-xs text-gray-500 line-through opacity-70">donors</p>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -106,10 +109,7 @@ const Directory = () => {
                           <p className={`text-lg md:text-2xl font-bold ${selectedGroup === group ? "text-primary" : "text-primary/70"}`}>
                             {bloodGroupCounts[group] || 0}
                           </p>
-                          <div className="flex flex-col items-center -space-y-0.5">
-                            <p className="text-xs font-medium text-primary/80">Heros</p>
-                            <p className="text-xs text-gray-500 line-through opacity-70">donors</p>
-                          </div>
+                          <p className="text-xs text-gray-500">donors</p>
                         </div>
                       </div>
                     </CardContent>

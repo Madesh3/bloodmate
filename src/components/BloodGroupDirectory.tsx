@@ -31,7 +31,6 @@ const BloodGroupDirectory = ({
   const { donors, isLoading, handleDelete, setDonors, fetchTotalDonorsCount, allDonors } = useDonors(searchBloodGroup, searchCity);
   const { selectedDonors, setSelectedDonors, handleDonorSelect, handleSelectAll } = useDonorSelection(donors);
 
-  // Fetch total donors count on component mount
   useEffect(() => {
     const getTotalCount = async () => {
       const count = await fetchTotalDonorsCount();
@@ -41,7 +40,6 @@ const BloodGroupDirectory = ({
     getTotalCount();
   }, [fetchTotalDonorsCount, onDonorsCountChange]);
 
-  // Update blood group counts using allDonors instead of filtered donors
   useEffect(() => {
     const counts = allDonors.reduce((acc: { [key: string]: number }, donor) => {
       const group = donor.blood_group;

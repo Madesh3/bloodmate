@@ -1,7 +1,7 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAuth } from "@/components/AuthProvider";
+import { Search } from "lucide-react";
 
 interface DonorSearchProps {
   searchBloodGroup: string;
@@ -15,8 +15,6 @@ interface DonorSearchProps {
 }
 
 const DonorSearch = ({
-  searchBloodGroup,
-  setSearchBloodGroup,
   searchCity,
   setSearchCity,
   onSelectAll,
@@ -28,32 +26,16 @@ const DonorSearch = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="relative">
         <div className="relative">
-          <Select value={searchBloodGroup} onValueChange={setSearchBloodGroup}>
-            <SelectTrigger className="w-full bg-white">
-              <SelectValue placeholder="Select Blood Group" />
-            </SelectTrigger>
-            <SelectContent 
-              className="bg-white z-[100] relative" 
-              position="popper" 
-              sideOffset={4}
-            >
-              <SelectItem value="_all">All Blood Groups</SelectItem>
-              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => (
-                <SelectItem key={group} value={group}>
-                  {group}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+          <Input
+            placeholder="Search by city, area or pincode..."
+            value={searchCity}
+            onChange={(e) => setSearchCity(e.target.value)}
+            className="bg-white pl-10 w-full"
+          />
         </div>
-        <Input
-          placeholder="Search by city..."
-          value={searchCity}
-          onChange={(e) => setSearchCity(e.target.value)}
-          className="bg-white"
-        />
       </div>
       {user && donorsCount > 0 && (
         <div className="flex items-center space-x-2 bg-white p-2 rounded-lg">

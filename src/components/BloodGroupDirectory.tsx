@@ -10,22 +10,27 @@ interface BloodGroupDirectoryProps {
   onBloodGroupCountsChange?: (counts: { [key: string]: number }) => void;
   searchBloodGroup?: string;
   setSearchBloodGroup?: (value: string) => void;
+  searchCity?: string;
+  setSearchCity?: (value: string) => void;
 }
 
 const BloodGroupDirectory = ({ 
   onDonorsCountChange,
   onBloodGroupCountsChange,
   searchBloodGroup: externalSearchBloodGroup,
-  setSearchBloodGroup: externalSetSearchBloodGroup
+  setSearchBloodGroup: externalSetSearchBloodGroup,
+  searchCity: externalSearchCity,
+  setSearchCity: externalSetSearchCity
 }: BloodGroupDirectoryProps) => {
   const [internalSearchBloodGroup, setInternalSearchBloodGroup] = useState("");
-  const [searchCity, setSearchCity] = useState("");
-  const [totalDonorsCount, setTotalDonorsCount] = useState(0);
+  const [internalSearchCity, setInternalSearchCity] = useState("");
   const { user } = useAuth();
 
   // Use external or internal state based on props
   const searchBloodGroup = externalSearchBloodGroup ?? internalSearchBloodGroup;
   const setSearchBloodGroup = externalSetSearchBloodGroup ?? setInternalSearchBloodGroup;
+  const searchCity = externalSearchCity ?? internalSearchCity;
+  const setSearchCity = externalSetSearchCity ?? setInternalSearchCity;
 
   const { donors, isLoading, handleDelete, setDonors, fetchTotalDonorsCount, allDonors } = useDonors(searchBloodGroup, searchCity);
   const { selectedDonors, setSelectedDonors, handleDonorSelect, handleSelectAll } = useDonorSelection(donors);
@@ -33,7 +38,7 @@ const BloodGroupDirectory = ({
   useEffect(() => {
     const getTotalCount = async () => {
       const count = await fetchTotalDonorsCount();
-      setTotalDonorsCount(count);
+      setDonorsCount(count);
       onDonorsCountChange?.(count);
     };
     getTotalCount();
@@ -60,8 +65,6 @@ const BloodGroupDirectory = ({
   if (isLoading) {
     return <div className="text-center py-8">Loading donors...</div>;
   }
-
-  const areAllSelected = donors.length > 0 && selectedDonors.length === donors.length;
 
   return (
     <div className="w-full max-w-4xl space-y-6">

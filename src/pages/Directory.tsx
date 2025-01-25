@@ -1,7 +1,7 @@
 import BloodGroupDirectory from "@/components/BloodGroupDirectory";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
-import DonorSearch from "@/components/donors/DonorSearch";
+import { Input } from "@/components/ui/input";
 
 interface BloodGroupCount {
   [key: string]: number;
@@ -58,12 +58,18 @@ const Directory = () => {
 
             {/* Search Bar Section */}
             <div className="max-w-2xl mx-auto">
-              <DonorSearch
-                searchCity={searchCity}
-                setSearchCity={setSearchCity}
-                donorsCount={donorsCount}
-                totalDonorsCount={donorsCount}
-              />
+              <div className="flex flex-col space-y-4">
+                <Input
+                  type="text"
+                  placeholder="Search by city..."
+                  value={searchCity}
+                  onChange={(e) => setSearchCity(e.target.value)}
+                  className="w-full px-4 py-2 text-lg"
+                />
+                <div className="text-sm text-gray-500 text-center">
+                  {donorsCount} donors available
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -102,6 +108,8 @@ const Directory = () => {
           onBloodGroupCountsChange={setBloodGroupCounts}
           searchBloodGroup={searchBloodGroup}
           setSearchBloodGroup={setSearchBloodGroup}
+          searchCity={searchCity}
+          setSearchCity={setSearchCity}
         />
       </div>
     </div>

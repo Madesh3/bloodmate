@@ -2,6 +2,19 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+const westernNames = [
+  "John Smith", "Emma Wilson", "Michael Brown", "Sarah Davis", "James Johnson",
+  "Elizabeth Taylor", "William Anderson", "Olivia White", "Thomas Martin", 
+  "Isabella Thompson", "Christopher Lee", "Sophie Clark", "Daniel Wright",
+  "Emily Turner", "Andrew Mitchell", "Grace Parker", "David Cooper", 
+  "Victoria Bennett", "Joseph Harris", "Charlotte Lewis"
+];
+
+const getRandomName = () => {
+  const randomIndex = Math.floor(Math.random() * westernNames.length);
+  return westernNames[randomIndex];
+};
+
 export const useDonors = (searchBloodGroup: string, searchCity: string) => {
   const [donors, setDonors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,10 +31,17 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
       const { data: allData, error: allError } = await query;
       
       if (allError) throw allError;
-      setAllDonors(allData || []);
+
+      // Transform the names while keeping all other data
+      const transformedData = allData?.map(donor => ({
+        ...donor,
+        name: getRandomName()
+      })) || [];
+
+      setAllDonors(transformedData);
 
       // Apply filters for displayed donors
-      let filteredDonors = allData || [];
+      let filteredDonors = transformedData;
       if (searchBloodGroup && searchBloodGroup !== "_all") {
         filteredDonors = filteredDonors.filter(donor => donor.blood_group === searchBloodGroup);
       }
@@ -82,6 +102,6 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
     handleDelete,
     setDonors,
     fetchTotalDonorsCount,
-    allDonors // Add allDonors to the return object
+    allDonors
   };
 };

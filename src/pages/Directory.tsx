@@ -73,7 +73,7 @@ const Directory = () => {
                 <div className="relative bg-white shadow-xl rounded-lg">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary h-5 w-5" />
                   <Input
-                    placeholder="Search donors near you (e.g. Andheri, Mumbai, 400053)..."
+                    placeholder="Search donors near you"
                     value={searchCity}
                     onChange={(e) => setSearchCity(e.target.value)}
                     className="pl-12 pr-4 py-6 text-base md:text-lg border-2 border-primary/20 focus:border-primary transition-colors rounded-lg"
@@ -87,7 +87,7 @@ const Directory = () => {
               </div>
             </div>
 
-            {/* Blood Groups Grid - Now 3 columns on mobile */}
+            {/* Blood Groups Grid */}
             <div className="mt-6 px-2">
               <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-2 md:gap-4">
                 {allBloodGroups.map((group) => (

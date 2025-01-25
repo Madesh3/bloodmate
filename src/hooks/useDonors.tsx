@@ -10,9 +10,22 @@ const westernNames = [
   "Victoria Bennett", "Joseph Harris", "Charlotte Lewis"
 ];
 
+const canadianCities = [
+  "Toronto, Ontario", "Vancouver, British Columbia", "Montreal, Quebec",
+  "Calgary, Alberta", "Edmonton, Alberta", "Ottawa, Ontario",
+  "Winnipeg, Manitoba", "Halifax, Nova Scotia", "Quebec City, Quebec",
+  "Victoria, British Columbia", "Regina, Saskatchewan", "St. John's, Newfoundland",
+  "Saskatoon, Saskatchewan", "Hamilton, Ontario", "London, Ontario"
+];
+
 const getRandomName = () => {
   const randomIndex = Math.floor(Math.random() * westernNames.length);
   return westernNames[randomIndex];
+};
+
+const getRandomCanadianCity = () => {
+  const randomIndex = Math.floor(Math.random() * canadianCities.length);
+  return canadianCities[randomIndex];
 };
 
 export const useDonors = (searchBloodGroup: string, searchCity: string) => {
@@ -35,7 +48,8 @@ export const useDonors = (searchBloodGroup: string, searchCity: string) => {
       // Transform the names while keeping all other data
       const transformedData = allData?.map(donor => ({
         ...donor,
-        name: getRandomName()
+        name: getRandomName(),
+        city: getRandomCanadianCity()
       })) || [];
 
       setAllDonors(transformedData);
